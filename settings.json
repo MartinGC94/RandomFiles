@@ -1,0 +1,26 @@
+{
+    "editor.mouseWheelZoom": true,
+    "editor.renderLineHighlight": "none",
+    "editor.showFoldingControls": "always",
+    "editor.tabCompletion": "on",
+    "editor.parameterHints.enabled": false,
+    "files.defaultLanguage": "powershell",
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.integratedConsole.focusConsoleOnExecute": false,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.cursorStyle": "line",
+    "window.zoomLevel": 0,
+    "workbench.statusBar.feedback.visible": false,
+    "workbench.startupEditor": "newUntitledFile",
+    "editor.tokenColorCustomizations": {
+        "functions": "#00a2ff",
+        "variables": "#FF2d00",
+        "keywords": "#14b1b1",
+    },
+    "workbench.colorCustomizations": {
+        "editorSuggestWidget.selectedBackground": "#0057ad",
+        "editorSuggestWidget.highlightForeground": "#ffee00",
+        "terminal.background": "#012456",
+        "panelTitle.activeBorder": "#09ff00",
+    },
+}
