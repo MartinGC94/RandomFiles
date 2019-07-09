@@ -1,8 +1,11 @@
 {
+    "editor.minimap.enabled": false,
+    "editor.snippetSuggestions": "none",
     "editor.mouseWheelZoom": true,
     "editor.renderLineHighlight": "none",
     "editor.showFoldingControls": "always",
-    "editor.tabCompletion": "on",
+    "editor.occurrencesHighlight": false,
+    "editor.selectionHighlight": true,
     "editor.parameterHints.enabled": false,
     "files.defaultLanguage": "powershell",
     "powershell.codeFormatting.useCorrectCasing": true,
@@ -10,17 +13,84 @@
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.cursorStyle": "line",
     "window.zoomLevel": 0,
-    "workbench.statusBar.feedback.visible": false,
     "workbench.startupEditor": "newUntitledFile",
     "editor.tokenColorCustomizations": {
+        "numbers": "#c07dff",
         "functions": "#00a2ff",
-        "variables": "#FF2d00",
-        "keywords": "#14b1b1",
+        "textMateRules": [
+            {
+                "scope": "variable.parameter",
+                "settings": {
+                    "foreground": "#ffffff"
+                }
+            },
+            {
+                "scope": "variable.other.readwrite",
+                "settings": {
+                    "foreground": "#ff4500"
+                }
+            },
+            {
+                "scope": "variable.other",
+                "settings": {
+                    "foreground": "#ffffff"
+                }
+            },
+            {
+                "scope": "keyword.control",
+                "settings": {
+                    "foreground": "#ffffff"
+                }
+            },
+            {
+                "scope": "storage.modifier",
+                "settings": {
+                    "foreground": "#ff4500"
+                }
+            },
+            {
+                "scope": "storage.type",
+                "settings": {
+                    "foreground": "#44bdbd"
+                }
+            },
+            {
+                "scope": "entity.name.function",
+                "settings": {
+                    "foreground": "#d5adfa"
+                }
+            },
+            {
+                "scope": "support.variable",
+                "settings": {
+                    "foreground": "#ff4500"
+                }
+            },
+            {
+                "scope": "constant.language",
+                "settings": {
+                    "foreground": "#ff4500"
+                }
+            },
+        ]
     },
     "workbench.colorCustomizations": {
         "editorSuggestWidget.selectedBackground": "#0057ad",
-        "editorSuggestWidget.highlightForeground": "#ffee00",
+        "editorSuggestWidget.background": "#000000",
+        "editorSuggestWidget.foreground": "#ffffff",
+        "editorSuggestWidget.highlightForeground": "#00ff15",
         "terminal.background": "#012456",
         "panelTitle.activeBorder": "#09ff00",
     },
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingQuotes": "never",
+    "editor.tabCompletion": "on",
+    "powershell.codeFormatting.newLineAfterOpenBrace": false,
+    "powershell.codeFormatting.openBraceOnSameLine": false,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.whitespaceInsideBrace": false,
+    "terminal.integrated.fontSize": 11,
+    "terminal.integrated.fontFamily": "Lucida Console, 'Courier New', monospace",
+    "editor.fontSize": 11,
+    "editor.fontFamily": "Lucida Console, 'Courier New', monospace",
 }
