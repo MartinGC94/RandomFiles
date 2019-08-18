@@ -1,0 +1,23 @@
+{
+	"name": "Improved ISE Theme",
+	"displayName": "%displayName%",
+	"description": "%description%",
+	"version": "1.0.0",
+	"publisher": "MartinGC94",
+	"license": "MIT",
+	"engines": { "vscode": "*" },
+	"contributes": {
+		"themes": [
+			{
+				"label": "ISE Light Theme",
+				"uiTheme": "vs",
+				"path": "./themes/ISE-Light-Theme.json"
+			},
+			{
+				"label": "ISE Dark Theme",
+				"uiTheme": "vs-dark",
+				"path": "./themes/ISE-Dark-Theme.json"
+			}
+		]
+	}
+}
