@@ -14,74 +14,6 @@
     "terminal.integrated.cursorStyle": "line",
     "window.zoomLevel": 0,
     "workbench.startupEditor": "newUntitledFile",
-    "editor.tokenColorCustomizations": {
-        "numbers": "#c07dff",
-        "functions": "#00a2ff",
-        "textMateRules": [
-            {
-                "scope": "variable.parameter",
-                "settings": {
-                    "foreground": "#ffffff"
-                }
-            },
-            {
-                "scope": "variable.other.readwrite",
-                "settings": {
-                    "foreground": "#ff4500"
-                }
-            },
-            {
-                "scope": "variable.other",
-                "settings": {
-                    "foreground": "#ffffff"
-                }
-            },
-            {
-                "scope": "keyword.control",
-                "settings": {
-                    "foreground": "#ffffff"
-                }
-            },
-            {
-                "scope": "storage.modifier",
-                "settings": {
-                    "foreground": "#ff4500"
-                }
-            },
-            {
-                "scope": "storage.type",
-                "settings": {
-                    "foreground": "#44bdbd"
-                }
-            },
-            {
-                "scope": "entity.name.function",
-                "settings": {
-                    "foreground": "#d5adfa"
-                }
-            },
-            {
-                "scope": "support.variable",
-                "settings": {
-                    "foreground": "#ff4500"
-                }
-            },
-            {
-                "scope": "constant.language",
-                "settings": {
-                    "foreground": "#ff4500"
-                }
-            },
-        ]
-    },
-    "workbench.colorCustomizations": {
-        "editorSuggestWidget.selectedBackground": "#0057ad",
-        "editorSuggestWidget.background": "#000000",
-        "editorSuggestWidget.foreground": "#ffffff",
-        "editorSuggestWidget.highlightForeground": "#00ff15",
-        "terminal.background": "#012456",
-        "panelTitle.activeBorder": "#09ff00",
-    },
     "editor.autoClosingBrackets": "never",
     "editor.autoClosingQuotes": "never",
     "editor.tabCompletion": "on",
@@ -89,8 +21,12 @@
     "powershell.codeFormatting.openBraceOnSameLine": false,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.whitespaceInsideBrace": false,
-    "terminal.integrated.fontSize": 11,
-    "terminal.integrated.fontFamily": "Lucida Console, 'Courier New', monospace",
-    "editor.fontSize": 11,
-    "editor.fontFamily": "Lucida Console, 'Courier New', monospace",
+    "terminal.integrated.fontSize": 12,
+    "terminal.integrated.fontFamily": "Lucida Console",
+    "editor.fontSize": 12,
+    "editor.fontFamily": "Lucida Console",
+    "editor.suggest.filterGraceful": false,
+    "editor.suggestSelection": "first",
+    "workbench.colorTheme": "ISE Dark Theme",
+    "editor.wordBasedSuggestions": false
 }
