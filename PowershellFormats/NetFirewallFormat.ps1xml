@@ -1,0 +1,72 @@
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>FirewallRuleOverview</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#root/standardcimv2/MSFT_NetFirewallRule</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>DisplayName</Label>
+            <Width>40</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Profile</Label>
+            <Width>25</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Enabled</Label>
+            <Width>8</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Direction</Label>
+            <Width>9</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Action</Label>
+            <Width>6</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Profile</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Enabled</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Direction</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Action</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

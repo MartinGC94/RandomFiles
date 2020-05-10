@@ -1,0 +1,57 @@
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>BasicImageInfoObjectList</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.BasicImageInfoObject</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>ImagePath</PropertyName>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>ImageIndex</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>ImageName</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>ImageSize</Label>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>ImageIndex</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>ImageName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  $size = $_.ImageSize;
+                  $postfixes = @( "B", "KB", "MB", "GB", "TB", "PB" )
+                  for ($i=0; $size -ge 1024 -and $i -lt $postfixes.Length; $i++) { $size = $size / 1024; }
+                  return "" + [System.Math]::Round($size,2) + " " + $postfixes[$i];
+                </ScriptBlock>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

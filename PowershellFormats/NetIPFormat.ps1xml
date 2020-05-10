@@ -1,0 +1,42 @@
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>IPOverview</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#ROOT/StandardCimv2/MSFT_NetIPAddress</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>AddressFamily</PropertyName>
+      </GroupBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>InterfaceAlias</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>IPAddress</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>PrefixLength</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>SuffixOrigin</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>AddressState</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
