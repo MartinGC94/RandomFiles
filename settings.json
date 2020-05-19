@@ -12,21 +12,27 @@
     "powershell.integratedConsole.focusConsoleOnExecute": false,
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.cursorStyle": "line",
-    "window.zoomLevel": 0,
     "workbench.startupEditor": "newUntitledFile",
     "editor.autoClosingBrackets": "never",
     "editor.autoClosingQuotes": "never",
     "editor.tabCompletion": "on",
-    "powershell.codeFormatting.newLineAfterOpenBrace": false,
-    "powershell.codeFormatting.openBraceOnSameLine": false,
-    "powershell.codeFormatting.newLineAfterCloseBrace": false,
-    "powershell.codeFormatting.whitespaceInsideBrace": false,
     "terminal.integrated.fontSize": 12,
     "terminal.integrated.fontFamily": "Lucida Console",
     "editor.fontSize": 12,
     "editor.fontFamily": "Lucida Console",
     "editor.suggest.filterGraceful": false,
+    "editor.wordBasedSuggestions": false,
     "editor.suggestSelection": "first",
     "workbench.colorTheme": "ISE Dark Theme",
-    "editor.wordBasedSuggestions": false
+    "powershell.powerShellDefaultVersion": "PowerShell Preview (x64)",
+    "workbench.sideBar.location": "right",
+    "editor.autoIndent": "keep",
+    "terminal.integrated.mouseWheelScrollSensitivity": 0.3,
+    "powershell.integratedConsole.forceClearScrollbackBuffer": true,
+    "editor.quickSuggestions": {
+        "other": false,
+        "comments": false,
+        "strings": false
+    },
+    "powershell.buttons.showPanelMovementButtons": true
 }
