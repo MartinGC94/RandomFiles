@@ -1,0 +1,4771 @@
+{
+	"information_for_contributors": [
+		"This file has been converted from https://github.com/PowerShell/EditorSyntax/blob/master/PowerShellSyntax.tmLanguage",
+		"If you want to provide a fix or improvement, please create a pull request against the original repository.",
+		"Once accepted there, we are happy to receive an update request."
+	],
+	"version": "altered from https://github.com/PowerShell/EditorSyntax/commit/472c9447da4e3160bef211d5e1a0c2dee3cce497",
+	"name": "PowerShell",
+	"scopeName": "source.powershell",
+	"patterns": [
+		{
+			"comment": "type without accessor or attribute needed in statement mode, mostly for [flags()] before an `enum`.",
+			"begin": "(?=\\[)",
+			"end": "(?=[\\n;)}\\]])",
+			"patterns": [
+				{
+					"comment": "if type advanced, test for attribute qualified keywords",
+					"begin": "(?!\\G)(?![\\n;)}\\]])",
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"include": "#attributeStatement"
+						},
+						{
+							"include": "#expression_mode"
+						}
+					]
+				},
+				{
+					"include": "#type"
+				},
+				{
+					"comment": "if not a type or attribute, try finishing in command mode",
+					"begin": "(?![\\n;)}\\]])",
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "#command_mode"
+						}
+					]
+				}
+			]
+		},
+		{
+			"include": "#RequiresDirective"
+		},
+		{
+			"comment": "`;` resume's in statement mode.",
+			"begin": ";",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.terminator.statement.powershell"
+				}
+			},
+			"end": "(?=[\\n;)}\\]])",
+			"patterns": [
+				{
+					"comment": "$self may have been combined with other includes, this will insure its just $self now",
+					"include": "$self"
+				}
+			]
+		},
+		{
+			"include": "#statements"
+		}
+	],
+	"repository": {
+		"attributeStatement": {
+			"patterns": [
+				{
+					"begin": "(?i:class)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "storage.type.class.powershell keyword.declaration.class.powershell"
+						}
+					},
+					"end": "}|(?=\\S)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.end.powershell"
+						}
+					},
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "[\\p{L}_]\\w*(?=[\\s\\[{(,;&|)}:#<>]|`\\s)",
+							"beginCaptures": {
+								"0": {
+									"name": "entity.name.type.class.powershell"
+								}
+							},
+							"end": "(?=\\S)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": ":",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.separator.colon.powershell"
+										}
+									},
+									"end": "(?=\\S)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "(?!`)((?>[\\p{L}_`][\\w#`+]*)(?=[<>.,\\s])(?:\\.\\g<1>?)?)",
+											"beginCaptures": {
+												"0": {
+													"patterns": [
+														{
+															"include": "#type_keywords"
+														},
+														{
+															"match": "[^\\.]+",
+															"name": "entity.other.inherited-class.powershell"
+														},
+														{
+															"match": "\\.",
+															"name": "punctuation.accessor.type.powershell"
+														}
+													]
+												}
+											},
+											"end": "(?=\\S)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"begin": ",",
+													"beginCaptures": {
+														"0": {
+															"name": "punctuation.separator.comma.powershell"
+														}
+													},
+													"end": "(?=\\S)",
+													"applyEndPatternLast": true,
+													"patterns": [
+														{
+															"begin": "(?!`)([\\p{L}_`][\\w#`+]*(?:\\.#*\\g<1>?)?)",
+															"beginCaptures": {
+																"0": {
+																	"patterns": [
+																		{
+																			"include": "#type_keywords"
+																		},
+																		{
+																			"match": "[^\\.]+",
+																			"name": "entity.other.inherited-class.powershell"
+																		},
+																		{
+																			"match": "\\.",
+																			"name": "punctuation.accessor.type.powershell"
+																		}
+																	]
+																}
+															},
+															"end": "(?=\\S)",
+															"applyEndPatternLast": true,
+															"patterns": [
+																{
+																	"include": "#notCode"
+																}
+															]
+														},
+														{
+															"include": "#notCode"
+														}
+													]
+												},
+												{
+													"include": "#notCode"
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"begin": "{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.section.braces.begin.powershell"
+								}
+							},
+							"end": "(?=})",
+							"contentName": "meta.class.powershell",
+							"patterns": [
+								{
+									"match": "((?i:hidden|static))(?=[\\s{(,;&|)}])",
+									"name": "storage.modifier.powershell"
+								},
+								{
+									"begin": "(?=[\\p{L}_])",
+									"end": "}|(?=[\\S\\n])",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"applyEndPatternLast": true,
+									"name": "meta.method.powershell",
+									"patterns": [
+										{
+											"match": "`\\n",
+											"name": "constant.character.escape.powershell"
+										},
+										{
+											"begin": "\\G([\\p{L}_]\\w*)",
+											"beginCaptures": {
+												"1": {
+													"name": "entity.name.function.powershell"
+												}
+											},
+											"end": "(?=[\\S\\n])",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"begin": "(?=\\()",
+													"end": "(?=\\S)",
+													"applyEndPatternLast": true,
+													"patterns": [
+														{
+															"begin": ":",
+															"beginCaptures": {
+																"0": {
+																	"name": "punctuation.separator.colon.powershell"
+																}
+															},
+															"end": "(?=[;{])",
+															"patterns": [
+																{
+																	"begin": "(?i:base)(?=[\\s{(,;&|)}])",
+																	"beginCaptures": {
+																		"0": {
+																			"name": "variable.language.super.powershell"
+																		}
+																	},
+																	"end": "(?=[;{])",
+																	"patterns": [
+																		{
+																			"include": "#declarationParameterSet"
+																		}
+																	]
+																}
+															]
+														},
+														{
+															"include": "#declarationParameterSet"
+														},
+														{
+															"begin": "{",
+															"beginCaptures": {
+																"0": {
+																	"name": "punctuation.section.braces.begin.powershell"
+																}
+															},
+															"end": "(?=})",
+															"contentName": "meta.method-body.powershell",
+															"patterns": [
+																{
+																	"include": "$self"
+																}
+															]
+														},
+														{
+															"include": "#notCode"
+														}
+													]
+												},
+												{
+													"include": "#notCode"
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								},
+								{
+									"include": "#variableNoProperty"
+								},
+								{
+									"include": "#type"
+								},
+								{
+									"comment": "default assignment for a property",
+									"begin": "(?==)",
+									"end": "(?!\\G)",
+									"patterns": [
+										{
+											"include": "#expression_mode"
+										}
+									]
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"begin": "((?i:enum))(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"1": {
+							"name": "storage.type.enum.powershell keyword.declaration.enum.powershell"
+						}
+					},
+					"end": "}|(?=\\S)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.end.powershell"
+						}
+					},
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "([\\p{L}_]\\w*)(?=[\\s\\[{(,;&|)}:#<>])",
+							"beginCaptures": {
+								"1": {
+									"name": "entity.name.type.enum.powershell"
+								}
+							},
+							"end": "(?=\\S)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"comment": "optional user specified type, PowerShell Core >= 6.2.0",
+									"begin": ":",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.separator.colon.powershell"
+										}
+									},
+									"end": "(?=\\S)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "(?!`)((?>[\\p{L}_`][\\w`+]*)(?=[.\\s])(?:\\.\\g<1>?)?)",
+											"beginCaptures": {
+												"0": {
+													"patterns": [
+														{
+															"include": "#type_Disolve"
+														}
+													]
+												}
+											},
+											"end": "(?=\\S)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#notCode"
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"begin": "{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.section.braces.begin.powershell"
+								}
+							},
+							"end": "(?=})",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.section.braces.end.powershell"
+								}
+							},
+							"contentName": "meta.enumeration-definition.powershell",
+							"patterns": [
+								{
+									"match": ";",
+									"name": "punctuation.terminator.assignment.enum-member.powershell"
+								},
+								{
+									"begin": "([\\p{L}_]\\w*)",
+									"beginCaptures": {
+										"1": {
+											"name": "entity.name.variable.enum-member.powershell"
+										}
+									},
+									"end": "(?=[#;&|}\\n])",
+									"patterns": [
+										{
+											"begin": "=",
+											"beginCaptures": {
+												"0": {
+													"name": "keyword.operator.assignment.enum-member.powershell"
+												}
+											},
+											"end": "(?=[#;&|}\\n])",
+											"patterns": [
+												{
+													"comment": "begin at the first token in the expression, to test for numeric and unary operators",
+													"begin": "(?![\\s#]|<#|`\\n)(?![\\n;&|)}\\]])",
+													"end": "(?=.|$)",
+													"applyEndPatternLast": true,
+													"patterns": [
+														{
+															"comment": "allow for possibility that numeric value or unary operators match first, before resuming in expression mode",
+															"begin": "(?!\\G)(?![\\n;&|)}\\]])",
+															"end": "(?=[\\n;)}\\]])",
+															"patterns": [
+																{
+																	"include": "#expression_mode"
+																}
+															]
+														},
+														{
+															"include": "#numericConstant"
+														},
+														{
+															"include": "#operators_preUnary"
+														},
+														{
+															"comment": "if neither numeric or a pre-unary operator, just finish in expression mode",
+															"begin": "(?![\\n;&|)}\\]])",
+															"end": "(?=[\\n;)}\\]])",
+															"patterns": [
+																{
+																	"include": "#expression_mode"
+																}
+															]
+														}
+													]
+												},
+												{
+													"include": "#commentBlock"
+												},
+												{
+													"comment": "normally provided by command mode, but thats not available here",
+													"match": "`\\n",
+													"name": "constant.character.escape.powershell"
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								},
+								{
+									"comment": "`,`, `&` and `|` not permitted here",
+									"match": "[,&|]",
+									"name": "invalid.source.powershell"
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				}
+			]
+		},
+		"statements": {
+			"patterns": [
+				{
+					"include": "#attributeStatement"
+				},
+				{
+					"begin": "(?i:function|filter|workflow)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "storage.type.$0.powershell keyword.declaration.$0.powershell"
+						}
+					},
+					"end": "}|(?=\\S)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.end.powershell"
+						}
+					},
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "(?:(global|local|script|private)(`)?(:)(?=[^\\s{(,;&)}])|(?=[^`'\"\\x{2018}-\\x{201E}\\s{(,;&)}<>$@#]|`(?!\\s)))",
+							"beginCaptures": {
+								"1": {
+									"name": "storage.modifier.scope.powershell"
+								},
+								"2": {
+									"name": "invalid.character.escape.powershell"
+								},
+								"3": {
+									"name": "punctuation.separator.colon.powershell"
+								}
+							},
+							"end": "(?=\\S)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G",
+									"end": "(?=[\\s{(,;&)}])|\\G]",
+									"name": "entity.name.function.powershell",
+									"patterns": [
+										{
+											"comment": "function names that start with `:` are treated differently",
+											"match": "\\G(?<!:):\\p{L}\\w*[^\\s{(,;&)}]?"
+										},
+										{
+											"include": "#functionName"
+										}
+									]
+								},
+								{
+									"begin": "(?!\\G)(?!})",
+									"end": "(?=\\S)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "{",
+											"beginCaptures": {
+												"0": {
+													"name": "punctuation.section.braces.begin.powershell"
+												}
+											},
+											"end": "(?=})",
+											"endCaptures": {
+												"0": {
+													"name": "punctuation.section.braces.end.powershell"
+												}
+											},
+											"contentName": "meta.function-body.powershell",
+											"patterns": [
+												{
+													"include": "$self"
+												}
+											]
+										},
+										{
+											"include": "#declarationParameterSet"
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								}
+							]
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"comment": "do,for,foreach,switch,while: allow a `:label` that must start the statement; A `:label` before a loop looks just like a function, and its possible to put the loop keyword on a later line!  Here we just see if a valid label appears to be the only useful thing on a single line",
+					"match": "(?>(:)([\\p{L}_]\\w*)(?=[\\s{(,;&|)}]))(?=(?>(?:`\\s|\\s*<#.*?#>)*)\\s*(?:(?i:do|for(?:each)?|switch|while)(?=[\\s{(,;&|)}])|#|<#.*$|`?$))",
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.label.powershell"
+						},
+						"2": {
+							"name": "entity.name.label.powershell"
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "#commentBlock"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "break,continue: permit a label following, then revert back to statement mode",
+					"begin": "(?i:break|continue)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.$0.powershell"
+						}
+					},
+					"end": "[\\p{L}_]\\w*|(?=$\\n|\\S)",
+					"endCaptures": {
+						"0": {
+							"name": "entity.name.label.powershell"
+						}
+					},
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#commentBlock"
+						}
+					]
+				},
+				{
+					"begin": "(?i:exit|return|throw)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.$0.powershell"
+						}
+					},
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "#command_mode"
+						}
+					]
+				},
+				{
+					"begin": "(?i:foreach)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.foreach.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "(?=\\()",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\(",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.group.begin.powershell"
+										}
+									},
+									"name": "meta.foreach-set.powershell",
+									"end": "\\)",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.group.end.powershell"
+										}
+									},
+									"patterns": [
+										{
+											"begin": "(?i:in)",
+											"beginCaptures": {
+												"0": {
+													"name": "keyword.control.foreach-in.powershell"
+												}
+											},
+											"end": "(?=[;)])",
+											"patterns": [
+												{
+													"include": "#command_mode"
+												}
+											]
+										},
+										{
+											"include": "#variableNoProperty"
+										},
+										{
+											"include": "#type"
+										},
+										{
+											"comment": "`;` not permitted here",
+											"match": ";",
+											"name": "invalid.terminator.statement.powershell"
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								},
+								{
+									"begin": "(?<=\\))(?![,)}])",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#advanceToToken"
+										},
+										{
+											"begin": "(?={)",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"begin": "\\G\\{",
+													"beginCaptures": {
+														"0": {
+															"name": "punctuation.section.braces.begin.powershell"
+														}
+													},
+													"end": "}",
+													"endCaptures": {
+														"0": {
+															"name": "punctuation.section.braces.end.powershell"
+														}
+													},
+													"name": "meta.statements.foreach-loop.powershell",
+													"patterns": [
+														{
+															"include": "$self"
+														}
+													]
+												},
+												{
+													"comment": "next statement, return when safe to exit",
+													"begin": "(?<=})(?![,)}\\]])",
+													"end": "(?<![})])(?=[\\n,})\\]])",
+													"patterns": [
+														{
+															"include": "$self"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"comment": "only allow foreach arguments before the `(`",
+							"begin": "\\G(?=[\\s#\\x{2013}-\\x{2015}-]|<#)",
+							"end": "(?![\\s#\\x{2013}-\\x{2015}-]|<#)",
+							"patterns": [
+								{
+									"comment": "-parallel parameter can only be used in a workflow, consider using meta scopes, and an injection to properly catch this",
+									"match": "(?i:([\\x{2013}-\\x{2015}-])parallel)(?:(:)|(?=[\\s\\[{(,;&|)}]))",
+									"beginCaptures": {
+										"1": {
+											"name": "variable.parameter.foreach-parallel.powershell"
+										},
+										"2": {
+											"name": "punctuation.definition.parameter.powershell"
+										},
+										"3": {
+											"name": "punctuation.separator.parameter-value.powershell"
+										}
+									}
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"comment": "`,`, `<` and `>` not permitted here",
+							"match": "[,<>]",
+							"name": "invalid.source.powershell"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"begin": "(?i:while)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.while.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?<![)}])(?=\\()",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\(",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.group.begin.powershell"
+										}
+									},
+									"end": "\\)",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.group.end.powershell"
+										}
+									},
+									"name": "meta.while-condition.powershell",
+									"patterns": [
+										{
+											"comment": "`;` not permitted here",
+											"match": ";",
+											"name": "invalid.source.powershell"
+										},
+										{
+											"include": "#command_mode"
+										}
+									]
+								},
+								{
+									"begin": "(?<=\\))(?=[\\s#]|<#|`\\s|{)",
+									"end": "(?<=})|$(?!\\G)",
+									"patterns": [
+										{
+											"include": "#advanceToToken"
+										},
+										{
+											"begin": "(?<!})(?={)",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"begin": "\\G\\{",
+													"beginCaptures": {
+														"0": {
+															"name": "punctuation.section.braces.begin.powershell"
+														}
+													},
+													"end": "}",
+													"endCaptures": {
+														"0": {
+															"name": "punctuation.section.braces.end.powershell"
+														}
+													},
+													"name": "meta.statements.while-loop.powershell",
+													"patterns": [
+														{
+															"include": "$self"
+														}
+													]
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"begin": "(?i:for)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.for.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?<![})])(?=\\()",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\(",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.group.begin.powershell"
+										}
+									},
+									"end": "\\)",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.group.end.powershell"
+										}
+									},
+									"name": "meta.for-condition.powershell",
+									"patterns": [
+										{
+											"comment": "`;` here resumes in command mode",
+											"match": ";",
+											"name": "punctuation.terminator.statement.powershell"
+										},
+										{
+											"include": "#command_mode"
+										}
+									]
+								},
+								{
+									"begin": "(?<=\\))(?![,)}])",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#advanceToToken"
+										},
+										{
+											"begin": "(?<!})(?={)",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"begin": "\\G\\{",
+													"beginCaptures": {
+														"0": {
+															"name": "punctuation.section.braces.begin.powershell"
+														}
+													},
+													"end": "}",
+													"endCaptures": {
+														"0": {
+															"name": "punctuation.section.braces.end.powershell"
+														}
+													},
+													"name": "meta.statements.for-loop.powershell",
+													"patterns": [
+														{
+															"include": "$self"
+														}
+													]
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"comment": "until/while (condition) ends do {statements}",
+					"begin": "(?i:do)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.do.powershell"
+						}
+					},
+					"end": "(?<=\\))|$(?!\\G)",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.do-loop.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"begin": "(?<=})(?![,;&|)}])",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"end": "(?<=\\))|$(?!\\G)",
+									"patterns": [
+										{
+											"include": "#advanceToToken"
+										},
+										{
+											"begin": "(?i:while)(?=[\\s{(,;&|)}])",
+											"beginCaptures": {
+												"0": {
+													"name": "keyword.control.do-while.powershell"
+												}
+											},
+											"end": "(?<=\\))|$(?!\\G)",
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"begin": "(?<!\\))(?=\\()",
+													"end": "(?=.|$)",
+													"applyEndPatternLast": true,
+													"patterns": [
+														{
+															"begin": "\\G\\(",
+															"beginCaptures": {
+																"0": {
+																	"name": "punctuation.section.group.begin.powershell"
+																}
+															},
+															"end": "\\)",
+															"endCaptures": {
+																"0": {
+																	"name": "punctuation.section.group.end.powershell"
+																}
+															},
+															"name": "meta.while-condition.powershell",
+															"patterns": [
+																{
+																	"comment": "`;` not permitted here",
+																	"match": ";",
+																	"name": "invalid.source.powershell"
+																},
+																{
+																	"include": "#command_mode"
+																}
+															]
+														}
+													]
+												},
+												{
+													"include": "#notCode"
+												}
+											]
+										},
+										{
+											"begin": "(?i:until)(?=[\\s{(,;&|)}])",
+											"beginCaptures": {
+												"0": {
+													"name": "keyword.control.do-until.powershell"
+												}
+											},
+											"end": "(?<=\\))|$(?!\\G)",
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"begin": "(?<!\\))(?=\\()",
+													"end": "(?=.|$)",
+													"applyEndPatternLast": true,
+													"patterns": [
+														{
+															"begin": "\\G\\(",
+															"beginCaptures": {
+																"0": {
+																	"name": "punctuation.section.group.begin.powershell"
+																}
+															},
+															"end": "\\)",
+															"endCaptures": {
+																"0": {
+																	"name": "punctuation.section.group.end.powershell"
+																}
+															},
+															"name": "meta.until-condition.powershell",
+															"patterns": [
+																{
+																	"comment": "`;` not permitted here",
+																	"match": ";",
+																	"name": "invalid.source.powershell"
+																},
+																{
+																	"include": "#command_mode"
+																}
+															]
+														}
+													]
+												},
+												{
+													"include": "#notCode"
+												}
+											]
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								}
+							]
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"comment": "else,elseif: only after if,elseif",
+					"begin": "(?i)(?=if[\\s{(,;&|)}])",
+					"end": "(?!\\G)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#ifStatement"
+						},
+						{
+							"begin": "(?i:else)(?=[\\s{(,;&|)}])",
+							"beginCaptures": {
+								"0": {
+									"name": "keyword.control.if-else.powershell"
+								}
+							},
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#advanceToToken"
+								},
+								{
+									"begin": "(?<!}){",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.if-else-condition.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"begin": "(?<=})(?![;)}\\]\\n])",
+									"end": "(?=[;)}\\]\\n])",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"begin": "(?i:switch)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.switch.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "(?=\\()",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\(",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.group.begin.powershell"
+										}
+									},
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "\\G",
+											"contentName": "meta.switch-value.powershell",
+											"end": "\\)",
+											"endCaptures": {
+												"0": {
+													"name": "punctuation.section.group.end.powershell"
+												}
+											},
+											"patterns": [
+												{
+													"comment": "`;` not permitted here",
+													"match": ";",
+													"name": "invalid.source.powershell"
+												},
+												{
+													"include": "#command_mode"
+												}
+											]
+										},
+										{
+											"begin": "(?<=\\))(?![,)}])",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"include": "#switchConditions"
+												},
+												{
+													"include": "#notCode"
+												},
+												{
+													"comment": "very limited what is permitted here",
+													"ignore": "[^\\s{]",
+													"name": "invalid.source.powershell"
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"include": "#switchConditions"
+						},
+						{
+							"comment": "only allow switch arguments before the `(` or `{`",
+							"begin": "\\G(?=[\\s#\\x{2013}-\\x{2015}-]|<#)",
+							"end": "(?![\\s#\\x{2013}-\\x{2015}-]|<#)",
+							"patterns": [
+								{
+									"match": "((?i:([\\x{2013}-\\x{2015}-])(regex|wildcard|exact|casesensitive)))(?:(:)|(?=[\\s\\[{(,;&|)}]))",
+									"captures": {
+										"1": {
+											"name": "variable.parameter.switch-$2.powershell"
+										},
+										"3": {
+											"name": "punctuation.definition.parameter.powershell"
+										},
+										"4": {
+											"name": "punctuation.separator.parameter-value.powershell"
+										}
+									}
+								},
+								{
+									"comment": "-file is special case, needs file argument, no condition expression",
+									"begin": "((?i:([\\x{2013}-\\x{2015}-])file))(?:(:)|(?=[\\s\\[{(,;&|)}]))",
+									"beginCaptures": {
+										"1": {
+											"name": "variable.parameter.switch-file.powershell"
+										},
+										"2": {
+											"name": "punctuation.definition.parameter.powershell"
+										},
+										"3": {
+											"name": "punctuation.separator.parameter-value.powershell"
+										}
+									},
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "\\G(?![,;&|)}<>])",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"begin": "(?<=[\\s>]|\\G|^)(?![\\s#,;&|)}<>]|<#|$)",
+													"end": "(?!\\G)",
+													"name": "meta.argument.switch-file.powershell",
+													"patterns": [
+														{
+															"include": "#argument"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"comment": "`,`, `<` and `>` not permitted here",
+							"match": "[,<>]",
+							"name": "invalid.source.powershell"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"begin": "(?i:trap)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.trap.powershell"
+						}
+					},
+					"end": "(?=\\S|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"comment": "only one [exception] argument before the `{`",
+							"begin": "\\G(?=[\\s#\\[]|<#)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#advanceToToken"
+								},
+								{
+									"begin": "(?=\\[)",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "(?<=])(?![,)}])",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"begin": "(?={)",
+													"end": "(?=.|$)",
+													"applyEndPatternLast": true,
+													"patterns": [
+														{
+															"begin": "\\G\\{",
+															"beginCaptures": {
+																"0": {
+																	"name": "punctuation.section.braces.begin.powershell"
+																}
+															},
+															"end": "}",
+															"endCaptures": {
+																"0": {
+																	"name": "punctuation.section.braces.end.powershell"
+																}
+															},
+															"name": "meta.statements.trap.powershell",
+															"patterns": [
+																{
+																	"include": "$self"
+																}
+															]
+														},
+														{
+															"comment": "next statement, return when safe to exit",
+															"begin": "(?<=})(?![,)}\\]])",
+															"end": "(?<![}\\]])(?=[\\n,})\\]])",
+															"patterns": [
+																{
+																	"include": "$self"
+																}
+															]
+														}
+													]
+												},
+												{
+													"comment": "`,`, `<` and `>` not permitted here",
+													"match": "[,\\(\\[\\]<>]",
+													"name": "invalid.source.powershell"
+												}
+											]
+										},
+										{
+											"include": "#type"
+										}
+									]
+								},
+								{
+									"ignore": "#notCode"
+								}
+							]
+						},
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.trap.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "next statement, return when safe to exit",
+									"begin": "(?<=})(?![,)}\\]])",
+									"end": "(?<![}\\]])(?=[\\n,})\\]])",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								}
+							]
+						},
+						{
+							"comment": "`,`, `<` and `>` not permitted here",
+							"match": "[,\\(\\[\\]<>]",
+							"name": "invalid.source.powershell"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"comment": "catch/finally only after try",
+					"begin": "(?i:try)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.try.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.try.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"begin": "(?<=})(?![,;&|)}])",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#catchClause"
+										}
+									]
+								}
+							]
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"comment": "data: parameter `-supportedCommand` is array of cmdlets (function names)",
+					"begin": "(?i:data)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.$0.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"comment": "only allow data parameters before the `{`",
+							"begin": "\\G(?=[\\s#\\x{2013}-\\x{2015}-]|<#)",
+							"end": "(?![\\s#\\x{2013}-\\x{2015}-]|<#)",
+							"patterns": [
+								{
+									"comment": "-supportedcommand is special case, array of arguments",
+									"begin": "((?i:([\\x{2013}-\\x{2015}-])supportedcommand))(?:(:)|(?=[\\s\\[{(,;&|)}]))",
+									"beginCaptures": {
+										"1": {
+											"name": "variable.parameter.data-supportedcommand.powershell"
+										},
+										"2": {
+											"name": "punctuation.definition.parameter.powershell"
+										},
+										"3": {
+											"name": "punctuation.separator.parameter-value.powershell"
+										}
+									},
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"match": ",",
+											"name": "punctuation.separator.powershell"
+										},
+										{
+											"begin": "(?:\\G|(?<=,))(?![;&|)}<>])",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"begin": "(?<=[\\s>]|\\G|^)(?![\\s#,;&|)}<>]|<#|$)",
+													"end": "(?!\\G)",
+													"name": "meta.argument.data-supportedcommand.powershell",
+													"patterns": [
+														{
+															"include": "#argument"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.data-section.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "next statement, return when safe to exit",
+									"begin": "(?<=})(?![,)}\\]])",
+									"end": "(?<!})(?=[\\n,})\\]])",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "very limited what is permitted here",
+									"ignore": "[^\\s{}]",
+									"name": "invalid.source.powershell"
+								}
+							]
+						},
+						{
+							"comment": "`,`, `<` and `>` not permitted here",
+							"match": "[,\\[\\]<>]",
+							"name": "invalid.source.powershell"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"comment": "inlinescript,parallel,sequence: only in workflow; ",
+					"begin": "(?i:begin|dispose|dynamicparam|end|inlinescript|parallel|process|sequence)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.$0.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statement-block.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "next statement, return when safe to exit",
+									"begin": "(?<=})(?![,)}\\]])",
+									"end": "(?<!})(?=[\\n,})\\]])",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "very limited what is permitted here",
+									"ignore": "[^\\s{}]",
+									"name": "invalid.source.powershell"
+								}
+							]
+						},
+						{
+							"comment": "`,`, `<` and `>` not permitted here",
+							"match": "[,\\[\\]<>]",
+							"name": "invalid.source.powershell"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"comment": "the argument is permitted to be quoted; TODO",
+					"match": "(?i:(using))\\s+(?i:(assembly|namespace|module))\\s+((?>[\\p{L}_][\\w#]*(?:\\.#*)?)+(?=[<>.,+\\s\\[\\]]))",
+					"captures": {
+						"1": {
+							"name": "keyword.control.using.powershell"
+						},
+						"2": {
+							"name": "keyword.other.powershell"
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "#type_Disolve"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "from,var,define are reserved; configuration is TODO, needs significant syntax structure work.",
+					"match": "(?i:configuration|define|from|var)(?=[\\s{(,;&|)}])",
+					"name": "invalid.reserved.keyword.control.$0.powershell"
+				},
+				{
+					"comment": "param: only in main body or a function main body, and only if followed by parameter declaration",
+					"match": "(?i:param)(?=[\\s{(,;&|)}])",
+					"name": "keyword.control.$0.powershell"
+				},
+				{
+					"include": "#command_mode"
+				}
+			]
+		},
+		"command_mode": {
+			"patterns": [
+				{
+					"include": "#terminators"
+				},
+				{
+					"comment": "(dot) source operator, requires trailing space, or invoke operator",
+					"begin": "&|\\.(?=[\\s{(,;&|)}'\"\\x{2018}-\\x{201E}$@])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.invoke-or-source.powershell"
+						}
+					},
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"comment": "Next token needs to be an operand for the operator, not the actual command, but an expression or unquoted expandable string that describes the command's name.",
+							"begin": "\\G(?![,;&|)}<>])|\\G(?=<|[1-6]>&[12]|\\*>&1|[1-6*]?>>?)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#advanceToToken"
+								},
+								{
+									"comment": "at the begining of a command name, `<`, `>` or `>>` are the entire command name.",
+									"match": "(?:<|[1-6]>&[12]|\\*>&1|[1-6*]?>>?)",
+									"name": "entity.name.function.powershell"
+								},
+								{
+									"begin": "(?<=[\\s>]|\\G|^)(?![\\s#,;&|)}<>]|<#|$)",
+									"end": "(?!\\G)",
+									"name": "meta.argument.invoke-or-source.powershell",
+									"patterns": [
+										{
+											"include": "#argument"
+										}
+									]
+								}
+							]
+						},
+						{
+							"comment": "Next token needs to be an operand for the operator, not the actual command, but an expression or unquoted expandable string that describes the command's name.",
+							"begin": "(?![\\n;)}\\]])",
+							"end": "(?=[\\n;)}\\]])",
+							"patterns": [
+								{
+									"include": "#argument_mode"
+								}
+							]
+						}
+					]
+				},
+				{
+					"comment": "could be a numeric constant or a limited list of unary operators, that we should switch to expression mode",
+					"begin": "(?=[.,!+\\x{2013}-\\x{2015}-]|\\d(?!>&[12]))",
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"comment": "if unary operators/numeric constant advanced, switch to expression mode",
+							"begin": "(?!\\G)(?![\\n;)}\\]])",
+							"end": "(?=[\\n;)}\\]])",
+							"patterns": [
+								{
+									"include": "#expression_mode"
+								}
+							]
+						},
+						{
+							"include": "#numericConstant"
+						},
+						{
+							"include": "#operators_preUnary"
+						},
+						{
+							"comment": "if neither numeric or a pre-unary operator, try finishing command mode with a command name",
+							"begin": "(?![\\n;)}\\]])",
+							"end": "(?=[\\n;)}\\]])",
+							"patterns": [
+								{
+									"include": "#command_name"
+								}
+							]
+						}
+					]
+				},
+				{
+					"comment": "patterns that indicate an expression, might be able to simplify this to include expression_mode and then see if the cursor advanced, sorta, don't forget about 'notCode', maybe check operand/operator only first, as redirect could also be a problem.",
+					"begin": "(?=[$@][{(\\w:$^?]|[({\\[,]|@?['\"\\x{2018}-\\x{201E}]|[\\x{2013}-\\x{2015}-][\\s{(,;|)}#<>.!+%*/='\"\\x{2018}-\\x{201E}\\x{2013}-\\x{2015}-])",
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "#expression_mode"
+						}
+					]
+				},
+				{
+					"match": "`\\n",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"match": "`\\s",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"match": "\\|",
+					"name": "invalid.empty-pipe.powershell"
+				},
+				{
+					"include": "#command_name"
+				},
+				{
+					"comment": "catch that which didn't match elsewhere",
+					"match": "[^\\s]",
+					"name": "invalid.source.powershell"
+				}
+			]
+		},
+		"command_name": {
+			"patterns": [
+				{
+					"include": "#commentBlock"
+				},
+				{
+					"include": "#commentLine"
+				},
+				{
+					"include": "#commands"
+				},
+				{
+					"comment": "command names are allowed to start with < or >, without a backtick, but `function` requires a backtick.  See below!",
+					"begin": "(?:(global|local|script|private)(`)?(:)(?![\\s{(,;&|)}])|(?=[^`'\"\\x{2018}-\\x{201E}\\s{(,;&)}@#]|`(?!\\s)))",
+					"beginCaptures": {
+						"1": {
+							"name": "storage.modifier.scope.powershell"
+						},
+						"2": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"3": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					},
+					"end": "(?!\\G)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"comment": "at the begining of a command name, `]`, `<`, `>` or `>>` are the entire command name.",
+							"match": "\\G(?:]|<|\\*>&1|\\*?>>?|[1-6]>&[12])",
+							"name": "entity.name.function.powershell"
+						},
+						{
+							"begin": "\\G(?=[^\\n{(,;&|)}])",
+							"end": "(?=[\\s{(,;&|)}])",
+							"name": "entity.name.function.powershell",
+							"patterns": [
+								{
+									"comment": "function names that start with `:` are treated differently",
+									"match": "\\G(?<!:):\\p{L}\\w*[^\\s{(,;&|)}]?"
+								},
+								{
+									"include": "#functionName"
+								}
+							]
+						},
+						{
+							"begin": "(?![\\n;)}])",
+							"end": "(?=[\\n;)}])",
+							"patterns": [
+								{
+									"include": "#argument_mode"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"argument": {
+			"patterns": [
+				{
+					"include": "#scriptblock"
+				},
+				{
+					"include": "#expressionGroup"
+				},
+				{
+					"include": "#hashtable"
+				},
+				{
+					"include": "#array"
+				},
+				{
+					"include": "#quotedStrings_Members"
+				},
+				{
+					"include": "#numericConstant_argumentMode"
+				},
+				{
+					"comment": "could be variable reference, if it doesn't have member reference, its the start of an unquoted expandable string",
+					"begin": "(?=\\$[{\\w:$^?])",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"comment": "check out the first variable reference",
+							"begin": "\\G(?=\\$)",
+							"end": "(?!\\G)",
+							"patterns": [
+								{
+									"include": "#variableNoProperty"
+								}
+							]
+						},
+						{
+							"comment": "if a member access doesn't occur after variable, finish as an unquoted expandable string argument.",
+							"begin": "(?![\\s{(,;&|)}])(?!\\.(?!\\.)|::|\\[)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#unquotedArgument"
+								}
+							]
+						},
+						{
+							"begin": "(?=\\.(?!\\.)|::|\\[)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#accessors"
+								},
+								{
+									"comment": "attempt another argument after member access",
+									"include": "#argument"
+								}
+							]
+						}
+					]
+				},
+				{
+					"include": "#substatement"
+				},
+				{
+					"comment": "splatting cannot have members and certain characters following, including no line comment",
+					"match": "(?>@(?:[$^?]|(?>[\\w][\\w?]*:(?!:)|:)?(?:[\\w?]|:(?!:))+|:))(?![~`!@#$%^*<>\\]\\\\/'\"\\x{2018}-\\x{201E}+-])",
+					"captures": {
+						"0": {
+							"patterns": [
+								{
+									"include": "#variable_inner"
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "splatting cannot have members and certain characters following, including no line comment",
+					"match": "@(?![$^?:\\w])",
+					"name": "invalid.splat.powershell"
+				},
+				{
+					"include": "#unquotedArgument"
+				}
+			]
+		},
+		"argument_mode": {
+			"patterns": [
+				{
+					"include": "#redirection"
+				},
+				{
+					"comment": "`,` just continues current mode, after advancing to next token",
+					"begin": ",",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.separator.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"include": "#commentBlock"
+				},
+				{
+					"include": "#commentLine"
+				},
+				{
+					"begin": "(?<!\\w)(--%)(?!\\w)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.control.verbatim-argument.powershell"
+						}
+					},
+					"end": "$|(?=\\|)",
+					"patterns": [
+						{
+							"match": "[^\"\\x{201C}-\\x{201E}]+?",
+							"name": "string.unquoted.verbatim-argument.powershell"
+						},
+						{
+							"begin": "(?:[\"\\x{201C}-\\x{201E}])",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.string.begin.powershell"
+								}
+							},
+							"end": "(?:[\"\\x{201C}-\\x{201E}])|$",
+							"applyEndPatternLast": true,
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.string.end.powershell"
+								}
+							},
+							"name": "string.quoted.double.powershell"
+						}
+					]
+				},
+				{
+					"match": "(([\\x{2013}-\\x{2015}-])\\p{L}[^:\\s\\[{(,;&|)}'\"\\x{2018}-\\x{201E}]*)(?:(:)|(?=[\\s\\[{(,;&|)}]))",
+					"captures": {
+						"1": {
+							"name": "variable.parameter.powershell"
+						},
+						"2": {
+							"name": "punctuation.definition.parameter.powershell"
+						},
+						"3": {
+							"name": "punctuation.separator.parameter-value.powershell"
+						}
+					}
+				},
+				{
+					"include": "#argument"
+				}
+			]
+		},
+		"unquotedArgument": {
+			"patterns": [
+				{
+					"match": "`(?!\\n)\\s",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"match": "\\.(?=['\"\\x{2018}-\\x{201E}\\s{(,;&|)}$])",
+					"name": "string.unquoted.argument.powershell"
+				},
+				{
+					"begin": "(?![\\s{(,;&|)}])",
+					"alternateBegin": "(?=[^'\"\\x{2018}-\\x{201E}\\s\\[{(,;&|)}$@])|(?<=\\S)(?=[$@<>])",
+					"end": "(?=[\\s{(,;&|)}])",
+					"contentName": "string.unquoted.argument.powershell",
+					"patterns": [
+						{
+							"match": "\\G`[\\x{2013}-\\x{2015}-]",
+							"name": "constant.character.escape.powershell"
+						},
+						{
+							"include": "#unquotedStrings_text"
+						}
+					]
+				}
+			]
+		},
+		"expression_mode": {
+			"comment": "Keep in mind, before begining expression mode, check for prefixed unary operators, but check for numeric constants before that!  This is done for each area that forwards to expression mode.",
+			"patterns": [
+				{
+					"include": "#redirection"
+				},
+				{
+					"comment": "normally operands win matches first, but numeric constant and operators share common first characters, and their matching needs to be alternated such that after any operand matches, a check for operators should occur before a numeric value is checked for again.  Operators needs to have first priority of a match after a numeric constant.",
+					"include": "#operand"
+				},
+				{
+					"comment": "Once an operator has matched, subsequently #operators_preunary should be checked first until the next non operator token is found.  However, an operator might have matched before we've even gotten here (pre-unary)",
+					"include": "#operators"
+				},
+				{
+					"match": "`\\n",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"ignore": "`",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"include": "#notCode"
+				}
+			]
+		},
+		"operand": {
+			"patterns": [
+				{
+					"comment": "preunary operators are technically part of an operand expression",
+					"include": "#operators_preUnary"
+				},
+				{
+					"include": "#type"
+				},
+				{
+					"include": "#variable"
+				},
+				{
+					"include": "#expressionGroup"
+				},
+				{
+					"include": "#hashtable"
+				},
+				{
+					"include": "#scriptblock"
+				},
+				{
+					"include": "#numericConstant"
+				},
+				{
+					"include": "#array"
+				},
+				{
+					"include": "#substatement"
+				},
+				{
+					"include": "#quotedStrings_Members"
+				}
+			]
+		},
+		"array": {
+			"begin": "(?=@\\()",
+			"end": "(?!\\G)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "\\G(@)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.array.begin.powershell"
+						},
+						"2": {
+							"name": "punctuation.section.group.begin.powershell"
+						}
+					},
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.group.end.powershell"
+						}
+					},
+					"name": "meta.group.array-expression.powershell",
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				},
+				{
+					"begin": "(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				}
+			]
+		},
+		"catchClause": {
+			"patterns": [
+				{
+					"include": "#advanceToToken"
+				},
+				{
+					"begin": "(?i:catch)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.try-catch.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.try-catch.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"begin": "(?<=})(?![,)}]|$)",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#catchClause"
+										}
+									]
+								},
+								{
+									"comment": "very limited what is permitted here",
+									"ignore": "[^\\s{}]",
+									"name": "invalid.source.powershell"
+								}
+							]
+						},
+						{
+							"comment": "only [exception] arguments before the `{`",
+							"begin": "\\G(?=[\\s#\\[]|<#)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#advanceToToken"
+								},
+								{
+									"begin": "(?=\\[)",
+									"end": "(?![\\s#\\[,]|<#)",
+									"patterns": [
+										{
+											"match": ",",
+											"name": "punctuation.separator.powershell"
+										},
+										{
+											"include": "#type"
+										},
+										{
+											"include": "#notCode"
+										}
+									]
+								},
+								{
+									"include": "#notCode"
+								}
+							]
+						},
+						{
+							"comment": "`,`, `<` and `>` not permitted here",
+							"match": "[,<>]",
+							"name": "invalid.source.powershell"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				},
+				{
+					"begin": "(?i:finally)(?=[\\s{(,;&|)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.try-finally.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?={)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\{",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.braces.end.powershell"
+										}
+									},
+									"name": "meta.statements.try-finally.powershell",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "next statement, return when safe to exit",
+									"begin": "(?<=})(?![,)}\\]])",
+									"end": "(?<![}\\]])(?=[\\n,})\\]])",
+									"patterns": [
+										{
+											"include": "$self"
+										}
+									]
+								},
+								{
+									"comment": "very limited what is permitted here",
+									"ignore": "[^\\s{}]",
+									"name": "invalid.source.powershell"
+								}
+							]
+						}
+					]
+				},
+				{
+					"comment": "next statement, return when safe to exit",
+					"begin": "(?![,)}\\]]|$)",
+					"end": "(?<![}\\]])(?=[\\n,})\\]])",
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
+		"commentBlock": {
+			"begin": "<#",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.comment.block.begin.powershell"
+				}
+			},
+			"end": "#>",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.comment.block.end.powershell"
+				}
+			},
+			"name": "comment.block.powershell",
+			"patterns": [
+				{
+					"comment": "capture remainder of comment block, preventing #commentEmbeddedDocs from consuming to end of line",
+					"match": ".+?(?=#>)",
+					"captures": {
+						"0": {
+							"patterns": [
+								{
+									"comment": "restore the anchor point",
+									"begin": "(?=.)",
+									"end": "$",
+									"patterns": [
+										{
+											"include": "#commentEmbeddedDocs"
+										}
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"include": "#commentEmbeddedDocs"
+				}
+			]
+		},
+		"commentLine": {
+			"begin": "(#)#*",
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.comment.powershell"
+				}
+			},
+			"end": "$(?=(\\n)?)",
+			"endCaptures": {
+				"1": {
+					"name": "comment.line.powershell"
+				}
+			},
+			"name": "comment.line.powershell",
+			"patterns": [
+				{
+					"include": "#commentEmbeddedDocs"
+				}
+			]
+		},
+		"argumentModeEscapes": {
+			"patterns": [
+				{
+					"match": "`[`0abefnrtv'\"\\x{2018}-\\x{201E}$@{(,;&|)}#<>\\n]",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#unicodeEscape"
+				},
+				{
+					"match": "`",
+					"name": "invalid.character.escape.powershell"
+				}
+			]
+		},
+		"commands": {
+			"patterns": [
+				{
+					"comment": "Verb-Noun pattern:",
+					"begin": "[?|%|\\w][-|\\w|\\.]*",
+					"beginCaptures": {
+						"0": {
+							"name": "support.function.powershell"
+						}
+					},
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "#argument_mode"
+						}
+					]
+				},
+				{
+					"comment": "Builtin cmdlets with reserved verbs, trailing negative lookahead needs work",
+					"begin": "(?i:(?:foreach|where|sort|tee)-object)(?=[\\s{(,;&)}])",
+					"beginCaptures": {
+						"0": {
+							"name": "support.function.$0.powershell"
+						}
+					},
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "#argument_mode"
+						}
+					]
+				}
+			]
+		},
+		"commentEmbeddedDocs": {
+			"patterns": [
+				{
+					"captures": {
+						"1": {
+							"name": "constant.string.documentation.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.documentation.powershell"
+						}
+					},
+					"match": "(?:^|\\G)(?i:\\s*(\\.)(COMPONENT|DESCRIPTION|EXAMPLE|FUNCTIONALITY|INPUTS|LINK|NOTES|OUTPUTS|ROLE|SYNOPSIS))(?:\\s*$)",
+					"name": "comment.documentation.embedded.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.string.documentation.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.documentation.powershell"
+						},
+						"3": {
+							"name": "constant.character.documentation.powershell"
+						}
+					},
+					"match": "(?:^|\\G)(?i:\\s*(\\.)(EXTERNALHELP)\\s+(.+))",
+					"name": "comment.documentation.embedded.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.string.documentation.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.documentation.powershell"
+						},
+						"3": {
+							"name": "variable.other.documentation.powershell"
+						}
+					},
+					"match": "(?:^|\\G)(?i:\\s*(\\.)(REMOTEHELPRUNSPACE)\\s+(.+))",
+					"name": "comment.documentation.embedded.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.string.documentation.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.documentation.powershell"
+						},
+						"3": {
+							"name": "variable.other.property.documentation.powershell"
+						}
+					},
+					"match": "(?:^|\\G)(?i:\\s*(\\.)(FORWARDHELPCATEGORY)\\s+(Alias|Cmdlet|HelpFile|Function|General|Provider|FAQ|Glossary|ScriptCommand|ExternalScript|Filter|All)\\s*$)",
+					"name": "comment.documentation.embedded.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.string.documentation.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.documentation.powershell"
+						},
+						"3": {
+							"name": "entity.name.function.documentation.powershell"
+						}
+					},
+					"match": "(?:^|\\G)(?i:\\s*(\\.)(FORWARDHELPTARGETNAME)\\s+(.+))",
+					"name": "comment.documentation.embedded.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.string.documentation.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.documentation.powershell"
+						},
+						"3": {
+							"name": "variable.parameter.documentation.powershell"
+						}
+					},
+					"match": "(?:^|\\G)(?i:\\s*(\\.)(PARAMETER)\\s+(.+))",
+					"name": "comment.documentation.embedded.powershell"
+				}
+			]
+		},
+		"unicodeEscape": {
+			"comment": "`u{x} added in PowerShell 6.0 (x=1-6 hex digits, value ranging 0-10FFFF)",
+			"patterns": [
+				{
+					"match": "`u\\{(?:(?:10)\\h{1,4}|0?\\h{1,5})}",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"match": "`u(?:\\{\\h{,6}.)?",
+					"name": "invalid.character.escape.powershell"
+				}
+			]
+		},
+		"doubleQuotedStringEscapes": {
+			"patterns": [
+				{
+					"match": "`[`0abefnrtv\"\\x{201C}-\\x{201E}$]",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#unicodeEscape"
+				},
+				{
+					"match": "`",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"match": "(?:[\"\\x{201C}-\\x{201E}]){2}",
+					"name": "constant.character.escape.powershell"
+				}
+			]
+		},
+		"doubleQuotedHereStringEscapes": {
+			"patterns": [
+				{
+					"match": "`[`0abefnrtv]|^`[\"\\x{201C}-\\x{201E}](?=@)",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#unicodeEscape"
+				},
+				{
+					"match": "`",
+					"name": "invalid.character.escape.powershell"
+				}
+			]
+		},
+		"declarationParameterSet": {
+			"begin": "\\(",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.section.group.begin.powershell"
+				}
+			},
+			"name": "meta.parameters.powershell",
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.group.end.powershell"
+				}
+			},
+			"patterns": [
+				{
+					"begin": "=",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.assignment.parameter-default.powershell"
+						}
+					},
+					"end": "(?=[,)])|(?=\\n)(?!\\G)",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"comment": "begin at the first token in the expression, to test for numeric and unary operators",
+							"begin": "(?![\\n,;&|)}\\]])",
+							"end": "(?=[\\n,;&|)}\\]])",
+							"patterns": [
+								{
+									"include": "#expression_mode"
+								}
+							]
+						}
+					]
+				},
+				{
+					"match": ",",
+					"name": "punctuation.separator.comma.powershell"
+				},
+				{
+					"include": "#variableNoProperty"
+				},
+				{
+					"include": "#type"
+				},
+				{
+					"include": "#notCode"
+				}
+			]
+		},
+		"expressionGroup": {
+			"begin": "(?=\\()",
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "\\(",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.group.begin.powershell"
+						}
+					},
+					"name": "meta.group.subexpression.powershell",
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.group.end.powershell"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#command_mode"
+						}
+					]
+				},
+				{
+					"begin": "(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				}
+			]
+		},
+		"ifStatement": {
+			"comment": "else,elseif: only after if,elseif",
+			"begin": "\\G(?i:(if)|(elseif))(?=[\\s{(,;&|)}])",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.if.powershell"
+				},
+				"2": {
+					"name": "keyword.control.if-elseif.powershell"
+				}
+			},
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"include": "#advanceToToken"
+				},
+				{
+					"begin": "(?<![)}])(?=\\()",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "\\G\\(",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.section.group.begin.powershell"
+								}
+							},
+							"end": "\\)",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.section.group.end.powershell"
+								}
+							},
+							"name": "meta.if-condition.powershell",
+							"patterns": [
+								{
+									"comment": "`;` not permitted here",
+									"match": ";",
+									"name": "invalid.source.powershell"
+								},
+								{
+									"include": "#command_mode"
+								}
+							]
+						},
+						{
+							"begin": "(?<=\\))(?=[\\s#]|<#|`\\s|{)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#advanceToToken"
+								},
+								{
+									"begin": "(?<!})(?={)",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"begin": "\\G\\{",
+											"beginCaptures": {
+												"0": {
+													"name": "punctuation.section.braces.begin.powershell"
+												}
+											},
+											"end": "}",
+											"endCaptures": {
+												"0": {
+													"name": "punctuation.section.braces.end.powershell"
+												}
+											},
+											"name": "meta.statements.if-condition.powershell",
+											"patterns": [
+												{
+													"include": "$self"
+												}
+											]
+										},
+										{
+											"begin": "(?<=})(?=[\\s#]|<#|`\\s)",
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												},
+												{
+													"begin": "(?i)(?=elseif[\\s{(,;&|)}])",
+													"end": "(?!\\G)",
+													"patterns": [
+														{
+															"include": "#ifStatement"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"substatement": {
+			"begin": "(?=\\$\\()",
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "(\\$)(\\()",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.substatement.powershell"
+						},
+						"2": {
+							"name": "punctuation.section.group.begin.powershell"
+						}
+					},
+					"contentName": "meta.group.substatement-expression.powershell",
+					"end": "\\)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.group.end.powershell"
+						}
+					},
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				},
+				{
+					"begin": "(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				}
+			]
+		},
+		"substatementEmbedded": {
+			"begin": "(\\$)(\\()",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.other.substatement.powershell punctuation.section.embedded.begin.powershell"
+				},
+				"2": {
+					"name": "punctuation.section.group.begin.powershell punctuation.section.embedded.begin.powershell"
+				}
+			},
+			"name": "meta.embedded.substatement.powershell interpolated.complex.source.powershell",
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.section.group.end.powershell punctuation.section.embedded.end.powershell"
+				}
+			},
+			"patterns": [
+				{
+					"include": "$self"
+				}
+			]
+		},
+		"numericConstant": {
+			"patterns": [
+				{
+					"begin": "(?>(?i:[+\\x{2013}-\\x{2015}-]?(?:0(?:x\\h+|b[01]+)|(?:\\d+(?:\\.(?!\\.)\\d*)?|\\.\\d+)(?:e[+\\x{2013}-\\x{2015}-]?\\d+)?)(?:u?[lsy]|[dnu])?(?:[kmgtp]b)?))(?=[\\s{(,;&|)}#\\]<>.!+%*/=\\x{2013}-\\x{2015}-])",
+					"beginCaptures": {
+						"0": {
+							"patterns": [
+								{
+									"include": "#numericConstant_capture"
+								}
+							]
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#numeric_post"
+						}
+					]
+				},
+				{
+					"comment": "capture negative invalid constant construct",
+					"name": "invalid.numeric-constant.powershell",
+					"match": "([\\x{2013}-\\x{2015}-]\\.(?i:(?:e[+\\x{2013}-\\x{2015}-]?\\d+)?(?:[dlsyn]|u[lsy]?)?))((?i:[kmgtp]b))?(?=[\\s{(,;&|)}#\\]<>.!+%*/=\\x{2013}-\\x{2015}-])"
+				}
+			],
+			"repository": {
+				"numeric_post": {
+					"patterns": [
+						{
+							"begin": "\\G(?=\\.(?!\\.)|::|\\[)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#accessors"
+								}
+							]
+						},
+						{
+							"begin": "\\G(?=[\\s.+\\x{2013}-\\x{2015}-]|<#|`\\n)(?![\\x{2013}-\\x{2015}-]\\p{L}|\\n)",
+							"end": "\\.\\.|\\+\\+?|[\\x{2013}-\\x{2015}-](?!\\p{L})[\\x{2013}-\\x{2015}-]?|(?=\\n)|(?![\\s]|<#|`\\n|$)",
+							"endCaptures": {
+								"0": {
+									"patterns": [
+										{
+											"include": "#operators"
+										}
+									]
+								}
+							},
+							"patterns": [
+								{
+									"match": "`\\n",
+									"name": "constant.character.escape.powershell"
+								},
+								{
+									"include": "#commentBlock"
+								}
+							]
+						}
+					]
+				}
+			}
+		},
+		"numericConstant_capture": {
+			"patterns": [
+				{
+					"captures": {
+						"1": {
+							"name": "constant.numeric.hex.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.powershell"
+						},
+						"3": {
+							"name": "constant.language.powershell"
+						}
+					},
+					"match": "([+\\x{2013}-\\x{2015}-]?0(?i:x\\h+(u?[lsy]|[nu])?))((?i:[kmgtp]b))?$"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.numeric.binary.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.powershell"
+						},
+						"3": {
+							"name": "constant.language.powershell"
+						}
+					},
+					"match": "([+\\x{2013}-\\x{2015}-]?0(?i:b[01]+(u?[lsy]|[dnu])?))((?i:[kmgtp]b))?$"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.numeric.decimal.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.decimal.powershell"
+						},
+						"5": {
+							"name": "constant.language.powershell"
+						}
+					},
+					"match": "([+\\x{2013}-\\x{2015}-]?(?i:\\d+(?:(?:(d)|(?:(e[+\\x{2013}-\\x{2015}-]?\\d+)\\g<2>?))|\\.\\d*(\\g<3>?\\g<2>?))|\\.\\d+\\g<4>))((?i:[kmgtp]b))?$"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "constant.numeric.integer.powershell"
+						},
+						"3": {
+							"name": "storage.modifier.powershell"
+						},
+						"4": {
+							"name": "constant.language.powershell"
+						}
+					},
+					"match": "([+\\x{2013}-\\x{2015}-]?(?:\\d+(?i:(?:\\.\\d*)?((?:e[+\\x{2013}-\\x{2015}-]?\\d+)?(u?[lsy]|[un])))?|(?:\\.\\d+)\\g<2>))((?i:[kmgtp]b))?$"
+				}
+			]
+		},
+		"numericConstant_argumentMode": {
+			"match": "(?>(?i:(?:0(?:x\\h+|b[01]+)|(?:\\d+(?:\\.(?!\\.)\\d*)?|\\.\\d+)(?:e[+\\x{2013}-\\x{2015}-]?\\d+)?)(?:u?[lsy]|[dnu])?(?:[kmgtp]b)?))(?=[\\s{(,;&|)}])",
+			"captures": {
+				"0": {
+					"patterns": [
+						{
+							"include": "#numericConstant_capture"
+						}
+					]
+				}
+			}
+		},
+		"scriptblock": {
+			"begin": "(?={)",
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.begin.powershell"
+						}
+					},
+					"end": "}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.end.powershell"
+						}
+					},
+					"name": "meta.scriptblock.powershell",
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				},
+				{
+					"begin": "(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				}
+			]
+		},
+		"type": {
+			"comment": "This is used by both type and attribute references.",
+			"begin": "(?=\\[)",
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "\\G\\[",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.bracket.begin.powershell"
+						}
+					},
+					"end": "]|(?=\\n)",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.bracket.end.powershell"
+						}
+					},
+					"applyEndPatternLast": true,
+					"name": "meta.attribute-or-type-reference.powershell",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"match": "(?i)(?:(?:cmdletbinding|alias|flags|outputtype|parameter|validate(?:not(?:null(?:orempty)?)|count|set|script|range|pattern|length)|allow(?:null|empty(?:collection|string))|supportswildcards|dsc(?:resource|property)|psdefaultvalue)(?![.\\w+`-]))",
+							"name": "support.function.attribute.powershell"
+						},
+						{
+							"begin": "(?=\\()",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\G\\(",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.group.attribute-argument-set.begin.powershell"
+										}
+									},
+									"end": "\\)",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation..group.attribute-argument-set.end.powershell"
+										}
+									},
+									"applyEndPatternLast": true,
+									"name": "meta.attribute-argument-set.powershell",
+									"patterns": [
+										{
+											"include": "#advanceToToken"
+										},
+										{
+											"begin": "\\b([\\p{L}_]\\w*)",
+											"beginCaptures": {
+												"1": {
+													"name": "variable.parameter.attribute.powershell"
+												}
+											},
+											"end": "(?=[\\n,;&|)}\\]])",
+											"patterns": [
+												{
+													"begin": "=",
+													"beginCaptures": {
+														"0": {
+															"name": "keyword.operator.assignment.attribute-argument.powershell"
+														}
+													},
+													"end": "(?=[,;&|)}\\]])",
+													"patterns": [
+														{
+															"include": "#advanceToToken"
+														},
+														{
+															"comment": "begin at the first token in the expression, to test for numeric and unary operators",
+															"begin": "(?!$|[,;|)}\\]])",
+															"end": "(?=$|[,;|)}\\]])",
+															"patterns": [
+																{
+																	"include": "#expression_mode"
+																}
+															]
+														},
+														{
+															"include": "#notCode"
+														}
+													]
+												},
+												{
+													"include": "#notCode"
+												}
+											]
+										},
+										{
+											"comment": "this makes `=` invalid without an argument name",
+											"match": "=",
+											"name": "invalid.source.powershell"
+										},
+										{
+											"comment": "`,` just continues current mode, after advancing to next token",
+											"begin": ",",
+											"beginCaptures": {
+												"0": {
+													"name": "keyword.operator.attribute-argument-separator.comma.powershell"
+												}
+											},
+											"end": "(?=.|$)",
+											"applyEndPatternLast": true,
+											"patterns": [
+												{
+													"include": "#advanceToToken"
+												}
+											]
+										},
+										{
+											"comment": "this gets expressions without argument names",
+											"include": "#expression_mode"
+										}
+									]
+								},
+								{
+									"begin": "(?<=\\))(?![;&|)}\\]])",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#advanceToToken"
+										}
+									]
+								}
+							]
+						},
+						{
+							"include": "#type_SubType"
+						}
+					]
+				},
+				{
+					"comment": "index access is not permitted here",
+					"begin": "(?=\\.(?!\\.)|::)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.bracket.end.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						},
+						{
+							"begin": "(?!\\G)(?![\\n;)}\\]])",
+							"end": "(?=[\\n;)}\\]])",
+							"patterns": [
+								{
+									"include": "#expression_mode"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"type_Disolve": {
+			"patterns": [
+				{
+					"include": "#type_keywords"
+				},
+				{
+					"match": "[^\\.+]+",
+					"name": "storage.type.powershell"
+				},
+				{
+					"match": "\\.",
+					"name": "punctuation.accessor.type.powershell.powershell"
+				},
+				{
+					"match": "\\+",
+					"name": "keyword.operator.type.powershell"
+				}
+			]
+		},
+		"type_SubType": {
+			"patterns": [
+				{
+					"begin": "(\\[)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.bracket.begin.powershell"
+						}
+					},
+					"end": "(])|[^\\s\\p{L},]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.bracket.end.powershell"
+						}
+					},
+					"applyEndPatternLast": true,
+					"name": "meta.type-reference.powershell",
+					"patterns": [
+						{
+							"include": "#type_SubType"
+						},
+						{
+							"match": ",",
+							"name": "punctuation.separator.comma.powershell"
+						},
+						{
+							"match": "[^\\s\\[\\]+,]+",
+							"name": "invalid.character.powershell"
+						}
+					]
+				},
+				{
+					"begin": "(?!`)((?>[\\p{L}_`][\\w#`+]*)(?=[<>.,+\\s(\\[\\]])(?:\\.#*\\g<1>?)?)",
+					"beginCaptures": {
+						"0": {
+							"patterns": [
+								{
+									"include": "#type_Disolve"
+								}
+							]
+						}
+					},
+					"end": "(?=[^\\s]|\\n)|(?<=])",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"match": "((?i:Version|Culture|PublicKeyToken))(=)([^,\\[\\]]*)",
+							"captures": {
+								"1": {
+									"name": "variable.parameter.attribute.powershell"
+								},
+								"2": {
+									"name": "keyword.operator.assignment.powershell"
+								},
+								"3": {
+									"name": "constant.character.powershell"
+								}
+							},
+							"name": "invalid.character.powershell"
+						},
+						{
+							"include": "#type_SubType"
+						},
+						{
+							"match": ",",
+							"name": "punctuation.separator.comma.powershell"
+						},
+						{
+							"match": "(?<!])[^\\s\\[\\]\\(+,]+",
+							"name": "invalid.character.powershell"
+						}
+					]
+				},
+				{
+					"include": "#commentBlock"
+				},
+				{
+					"include": "#commentLine"
+				}
+			]
+		},
+		"type_keywords": {
+			"comment": "primitive types and base classes often used",
+			"patterns": [
+				{
+					"comment:": "[short], [ushort], [uint], [ulong] added PowerShell Core 6.2;",
+					"match": "(?<![.\\w-])(?i:(?:value)?type|void|switch|(?:ps(?:custom)?)?object|pscredential|psmoduleinfo|hashtable|scriptblock|string|single|float|double|decimal|s?byte|bool(?:ean)?|char|datetime|array|bigint|u?int(?:32|16|64)?|u?long|u?short)(?![.\\w#+`-])",
+					"name": "keyword.type.powershell"
+				},
+				{
+					"match": "(?<![.\\w-])(?i:system|math|text|convert|regex|xml|enum)(?![\\w#-])",
+					"name": "support.class.powershell"
+				},
+				{
+					"match": "(?<![.\\w-])(?i:ordered)(?![.\\w#+`\\[-])",
+					"name": "support.function.attribute.powershell"
+				},
+				{
+					"match": "(?<![.\\w-])(?i:ref)(?![.\\w#+`\\[-])",
+					"name": "storage.modifier.powershell"
+				}
+			]
+		},
+		"advanceToArgument": {
+			"comment": "consume spaces and comments (but not unescaped line ends) until the next token appears",
+			"begin": "\\G(?=[\\s]|<#|`\\s)",
+			"end": "(?!\\s)(?!$)|(?=\\n)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"match": "`\\n",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"comment": "useless escape, and doesn't count as a token",
+					"match": "`\\s",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"include": "#commentBlock"
+				}
+			]
+		},
+		"advanceToToken": {
+			"comment": "consume spaces and comments and line ends until the next token appears",
+			"begin": "\\G(?=[\\s#]|<#|`\\s)",
+			"end": "(?!\\s)(?!$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"comment": "useless escape, and doesn't count as a token",
+					"match": "`\\s",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"include": "#commentLine"
+				},
+				{
+					"include": "#commentBlock"
+				}
+			]
+		},
+		"accessors": {
+			"patterns": [
+				{
+					"begin": "\\G(?:\\.(?!\\.)|(?<!:)::)",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.accessor.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#members"
+						},
+						{
+							"include": "#commentLine"
+						},
+						{
+							"include": "#commentBlock"
+						},
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "\\G(?=\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "\\[",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.section.bracket.begin.powershell"
+								}
+							},
+							"end": "]",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.section.bracket.end.powershell"
+								}
+							},
+							"name": "meta.index.powershell",
+							"patterns": [
+								{
+									"comment": "should only be an expression, no assignment operators",
+									"include": "#expression_mode"
+								}
+							]
+						},
+						{
+							"begin": "(?=\\.(?!\\.)|::|\\[)",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#accessors"
+								}
+							]
+						}
+					]
+				},
+				{
+					"include": "#commentLine"
+				},
+				{
+					"include": "#commentBlock"
+				}
+			]
+		},
+		"members": {
+			"patterns": [
+				{
+					"begin": "(?<![\\])])(?:(?i:(foreach|where)(?=[\\({]))|([\\p{L}_]\\w*(?=\\()))",
+					"captures": {
+						"1": {
+							"name": "support.function.$1.powershell"
+						},
+						"2": {
+							"name": "entity.name.function.method.powershell"
+						}
+					},
+					"end": "(?!\\G)|(?=\\))",
+					"patterns": [
+						{
+							"begin": "\\G(?=\\()",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "\\(",
+									"beginCaptures": {
+										"0": {
+											"name": "punctuation.section.method-arguments.begin.powershell"
+										}
+									},
+									"contentName": "meta.method-arguments.powershell",
+									"end": "\\)",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.section.method-arguments.end.powershell"
+										}
+									},
+									"patterns": [
+										{
+											"include": "#expression_mode"
+										}
+									]
+								},
+								{
+									"begin": "(?=\\.(?!\\.)|::|\\[)",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#accessors"
+										}
+									]
+								}
+							]
+						},
+						{
+							"begin": "\\G(?=\\{)",
+							"end": "(?!\\G)",
+							"patterns": [
+								{
+									"include": "#scriptblock"
+								}
+							]
+						}
+					]
+				},
+				{
+					"begin": "(?<![\\])])[\\p{L}_]\\w*(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"beginCaptures": {
+						"0": {
+							"name": "variable.other.object.property.powershell"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				},
+				{
+					"match": "(?<![\\])])[\\p{L}_]\\w*",
+					"name": "variable.other.property.powershell"
+				},
+				{
+					"comment": "need to wrap a begin block around this using \\G",
+					"include": "#quotedStrings_Members"
+				}
+			]
+		},
+		"switchConditions": {
+			"begin": "(?={)",
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "\\G\\{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.begin.powershell"
+						}
+					},
+					"end": "}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.end.powershell"
+						}
+					},
+					"name": "meta.switch-conditions.powershell",
+					"patterns": [
+						{
+							"begin": "(?:\\G|(?<=\\}))(?![,;&|)}])",
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#advanceToToken"
+								},
+								{
+									"begin": "(?<=[\\s>]|\\G|^)(?![\\s#,;&|)}<>]|<#)",
+									"end": "(?!\\G)",
+									"name": "meta.argument.switch-condition.powershell",
+									"patterns": [
+										{
+											"comment": "default: only in switch",
+											"match": "(?i:default)(?=[\\s{(,;&|)}])",
+											"name": "keyword.control.switch-default.powershell"
+										},
+										{
+											"include": "#argument"
+										}
+									]
+								}
+							]
+						},
+						{
+							"begin": "{",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.section.braces.begin.powershell"
+								}
+							},
+							"end": "}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.section.braces.end.powershell"
+								}
+							},
+							"name": "meta.statements.switch-condition.powershell",
+							"patterns": [
+								{
+									"include": "$self"
+								}
+							]
+						},
+						{
+							"include": "#notCode"
+						},
+						{
+							"comment": "very limited what is permitted here",
+							"match": "[^\\s{()}]",
+							"name": "invalid.source.powershell"
+						}
+					]
+				},
+				{
+					"comment": "next statement, return when safe to exit",
+					"begin": "(?<=})(?![,)}\\]])",
+					"end": "(?<!})(?=[\\n,})\\]])",
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
+		"variable_inner": {
+			"comment": "separate the parts of the variable name and scope them, character validation has already been done",
+			"patterns": [
+				{
+					"match": "(?:\\G|[$@])(?:[^`:]|`[^:])*`?:$",
+					"name": "invalid.variable.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.scope.powershell"
+						},
+						"3": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"4": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					},
+					"comment": "These are special constants.",
+					"match": "(?:\\G|([$@]))(?i:(?:(global|local|private|script|using|workflow)?(`)?(:))?(?:False|Null|True))$",
+					"name": "constant.language.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.scope.powershell"
+						},
+						"3": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"4": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					},
+					"comment": "These are the other built-in constants.",
+					"match": "(?:\\G|([$@]))(?i:(?:(global|local|private|script|using|workflow)?(`)?(:))?(?:Error|ExecutionContext|Is(?:CoreCLR|Linux|MacOS|Windows)|Host|Home|PID|PSHome|PSVersionTable|ShellID)$)",
+					"name": "variable.language.builtin.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.scope.powershell"
+						},
+						"3": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"4": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					},
+					"match": "(?:\\G|([$@]))(?i:(?:(global|local|private|script|using|workflow)?(`)?(:))?(?:[$^?_]|Args|ConsoleFileName|Event|EventArgs|EventSubscriber|ForEach|Input|LastExitCode|Matches|MyInvocation|NestedPromptLevel|Profile|PSBoundParameters|PSCmdlet|PSCulture|PSDebugContext|PSItem|PSCommandPath|PSScriptRoot|PSUICulture|Pwd|Sender|SourceArgs|SourceEventArgs|StackTrace|Switch|This)$)",
+					"name": "variable.language.builtin.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.powershell"
+						},
+						"2": {
+							"name": "storage.modifier.scope.powershell"
+						},
+						"3": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"4": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					},
+					"comment": "Style preference variables as language variables so that they stand out.",
+					"match": "(?:\\G|([$@]))(?i:(?:(global|local|private|script|using|workflow)?(`)?(:))?(?:ConfirmPreference|DebugPreference|ErrorActionPreference|ErrorView|FormatEnumerationLimit|InformationPreference|Log(?:Command|Engine|Provider)(?:HealthEvent|LifecycleEvent)|Maximum(?:AliasCount|DriveCount|ErrorCount|FunctionCount|HistoryCount|VariableCount)|OFS|OutputEncoding|ProgressPreference|PsCulture|PSDebugContext|PSDefaultParameterValues|PSEmailServer|PSItem|PSModuleAutoLoadingPreference|PSSenderInfo|PSSession(?:ApplicationName|ConfigurationName|Option)|VerbosePreference|WarningPreference|WhatIfPreference)$)",
+					"name": "variable.language.powershell"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "punctuation.definition.variable.powershell"
+						},
+						"2": {
+							"patterns": [
+								{
+									"include": "#variable_scopeOrDrive"
+								}
+							]
+						},
+						"3": {
+							"patterns": [
+								{
+									"include": "#variable_escapes"
+								}
+							]
+						}
+					},
+					"comment": "capture all other seemingly valid normal variables",
+					"match": "(?:\\G|([$@]))(?:([^:]*`?:))?(.*)",
+					"name": "variable.other.readwrite.powershell"
+				}
+			]
+		},
+		"variable_scopeOrDrive": {
+			"patterns": [
+				{
+					"comment": "workflow scope only available in workflow",
+					"match": "((?i:global|local|private|script|using|workflow))(`)?(:)",
+					"captures": {
+						"1": {
+							"name": "storage.modifier.scope.powershell"
+						},
+						"2": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"3": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					}
+				},
+				{
+					"match": "(?i:(Alias|Cert|Env|Function|HKCU|HKLM|Variable|WSMan))(`)?(:)",
+					"captures": {
+						"1": {
+							"name": "keyword.type.drive.powershell"
+						},
+						"2": {
+							"name": "invalid.character.escape.powershell"
+						},
+						"3": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					}
+				},
+				{
+					"comment": "Unknown drive",
+					"begin": "(?=.)",
+					"end": ":",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.separator.colon.powershell"
+						}
+					},
+					"name": "storage.type.drive.powershell",
+					"patterns": [
+						{
+							"include": "#variable_escapes"
+						}
+					]
+				}
+			]
+		},
+		"variable_bracketed_inside": {
+			"patterns": [
+				{
+					"comment": "capture a complete variable reference that appears on a single line and attempt to scope language variables",
+					"match": "\\G(?:[^`}:]*`?:)?[^`}]*(?=})",
+					"captures": {
+						"0": {
+							"patterns": [
+								{
+									"begin": "(?=.)",
+									"end": "(?!\\G)",
+									"patterns": [
+										{
+											"include": "#variable_inner"
+										}
+									]
+								}
+							]
+						}
+					}
+				},
+				{
+					"comment": "this captures up to the first colon, and then matches up the capture",
+					"match": "\\G(?:[^`}:]|`[^:])*`?:",
+					"captures": {
+						"0": {
+							"patterns": [
+								{
+									"include": "#variable_scopeOrDrive"
+								}
+							]
+						}
+					}
+				},
+				{
+					"include": "#variable_escapes"
+				}
+			]
+		},
+		"variable_escapes": {
+			"patterns": [
+				{
+					"match": "`(?:[`0abefnrtv{}\\n])",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#unicodeEscape"
+				},
+				{
+					"match": "`",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"match": "{",
+					"name": "invalid.character.powershell"
+				}
+			]
+		},
+		"variable": {
+			"patterns": [
+				{
+					"begin": "(?=\\$[{\\w:$^?])",
+					"end": "(?!\\G)",
+					"patterns": [
+						{
+							"begin": "\\G\\$(?:[$^?]|(?>[\\w][\\w?]*:(?!:)|:)?(?:[\\w?]|:(?!:))+)(?=\\.(?!\\.)|::|\\[)",
+							"beginCaptures": {
+								"0": {
+									"patterns": [
+										{
+											"include": "#variable_inner"
+										}
+									]
+								}
+							},
+							"end": "(?=.|$)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"include": "#accessors"
+								}
+							]
+						},
+						{
+							"match": "\\G\\$(?:[$^?]|(?>[\\w][\\w?]*:(?!:)|:)?(?:[\\w?]|:(?!:))+|:)",
+							"captures": {
+								"0": {
+									"patterns": [
+										{
+											"include": "#variable_inner"
+										}
+									]
+								}
+							}
+						},
+						{
+							"match": "\\$\\{}",
+							"name": "invalid.variable.powershell"
+						},
+						{
+							"begin": "(?=\\$\\{)",
+							"end": "(?!\\G)",
+							"applyEndPatternLast": true,
+							"patterns": [
+								{
+									"begin": "(\\$)(\\{)",
+									"beginCaptures": {
+										"1": {
+											"name": "punctuation.definition.variable.powershell"
+										},
+										"2": {
+											"name": "punctuation.definition.variable.braces.begin.powershell"
+										}
+									},
+									"end": "}",
+									"endCaptures": {
+										"0": {
+											"name": "punctuation.definition.variable.braces.end.powershell"
+										}
+									},
+									"name": "variable.other.readwrite.powershell",
+									"patterns": [
+										{
+											"include": "#variable_bracketed_inside"
+										}
+									]
+								},
+								{
+									"begin": "(?=\\.(?!\\.)|::|\\[)",
+									"end": "(?=.|$)",
+									"applyEndPatternLast": true,
+									"patterns": [
+										{
+											"include": "#accessors"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"comment": "splatting cannot be used outside of argument mode, result is invalid source.",
+					"match": "(?>@(?:[$^?]|(?>[\\w][\\w?]*:(?!:)|:)?(?:[\\w?]|:(?!:))+|:))",
+					"name": "invalid.splat.powershell"
+				}
+			]
+		},
+		"variableNoProperty": {
+			"begin": "(?=\\$[{\\w:$^?])",
+			"end": "(?!\\G)",
+			"name": "meta.embedded.interpolated.powershell",
+			"patterns": [
+				{
+					"match": "\\G\\$(?:[$^?]|(?>[\\w][\\w?]*:(?!:)|:)?(?:[\\w?]|:(?!:))+|:)",
+					"captures": {
+						"0": {
+							"patterns": [
+								{
+									"include": "#variable_inner"
+								}
+							]
+						}
+					}
+				},
+				{
+					"begin": "(?=\\$\\{)",
+					"end": "(?!\\G)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"begin": "(\\$)(\\{)",
+							"beginCaptures": {
+								"1": {
+									"name": "punctuation.definition.variable.powershell"
+								},
+								"2": {
+									"name": "punctuation.definition.variable.braces.begin.powershell"
+								}
+							},
+							"end": "}",
+							"endCaptures": {
+								"0": {
+									"name": "punctuation.definition.variable.braces.end.powershell"
+								}
+							},
+							"name": "variable.other.readwrite.powershell",
+							"patterns": [
+								{
+									"include": "#variable_bracketed_inside"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"RequiresDirective": {
+			"comment": "requires directive must be on single line, so capture and tokenize, current PS <= 6.2 allow `requires` keyword without delimiter, but the parameters must follow with a delimiter!",
+			"match": "^\\s*(#)((?i:requires))(.?)(.*)$",
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.comment.powershell"
+				},
+				"2": {
+					"name": "keyword.control.requires.powershell"
+				},
+				"3": {
+					"patterns": [
+						{
+							"match": "\\S",
+							"name": "invalid.source.powershell"
+						}
+					]
+				},
+				"4": {
+					"patterns": [
+						{
+							"match": "(([\\x{2013}-\\x{2015}-])(?i:Modules|PSSnapin|PSEdition|RunAsAdministrator|ShellId|Version)\\b)(:)?",
+							"captures": {
+								"1": {
+									"name": "variable.parameter.powershell"
+								},
+								"2": {
+									"name": "punctuation.definition.parameter.powershell"
+								},
+								"3": {
+									"name": "punctuation.separator.parameter-value.powershell"
+								}
+							}
+						},
+						{
+							"comment": "needs custom argument handler, single line quoted or unquoted arguments",
+							"match": "(?<!\\x{2013}-\\x{2015}-)\\b\\p{L}+|\\d+(?:\\.\\d+)*",
+							"name": "variable.parameter.powershell"
+						},
+						{
+							"match": ",",
+							"name": "punctuation.separator.powershell"
+						},
+						{
+							"comment": "needs custom hashtable that does not auto continue to next line",
+							"include": "#hashtable"
+						},
+						{
+							"include": "#notCode"
+						}
+					]
+				}
+			},
+			"name": "comment.line.powershell meta.requires.powershell"
+		},
+		"hashtable": {
+			"begin": "(?=@\\{)",
+			"end": "(?=.|$)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"begin": "(@)(\\{)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.other.hashtable.begin.powershell"
+						},
+						"2": {
+							"name": "punctuation.section.braces.begin.powershell"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.braces.end.powershell"
+						}
+					},
+					"name": "meta.hashtable.powershell",
+					"patterns": [
+						{
+							"include": "#hashtableAssignment"
+						}
+					]
+				},
+				{
+					"begin": "(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				}
+			]
+		},
+		"hashtableAssignment": {
+			"patterns": [
+				{
+					"match": "\\b([\\p{L}_]\\w*)(?=\\s*=)",
+					"name": "entity.name.variable.property.powershell"
+				},
+				{
+					"comment": "#type"
+				},
+				{
+					"comment": "#variable"
+				},
+				{
+					"comment": "#quotedStrings_Members"
+				},
+				{
+					"include": "#operand"
+				},
+				{
+					"begin": "(=)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.assignment.hashtable-member.powershell"
+						}
+					},
+					"end": "(?=[;}])|$(?!\\G)",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"begin": "(?![;}\\n])",
+							"end": "(?=[;}\\n])",
+							"patterns": [
+								{
+									"begin": "\\G",
+									"end": "(?!\\G)",
+									"patterns": [
+										{
+											"include": "#statements"
+										}
+									]
+								},
+								{
+									"include": "#hashtableAssignment"
+								}
+							]
+						}
+					]
+				},
+				{
+					"match": ";",
+					"name": "punctuation.terminator.assignment.hashtable-member.powershell"
+				},
+				{
+					"include": "#notCode"
+				}
+			]
+		},
+		"quotedStrings_Members": {
+			"comment": "detect all quoted strings (arguments or expressions) starting here",
+			"begin": "(?=@?['\"\\x{2018}-\\x{201E}])",
+			"end": "(?!\\G)",
+			"applyEndPatternLast": true,
+			"patterns": [
+				{
+					"comment": "single quoted strings",
+					"begin": "\\G['\\x{2018}-\\x{201B}]",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.powershell"
+						}
+					},
+					"end": "['\\x{2018}-\\x{201B}]",
+					"applyEndPatternLast": true,
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.powershell"
+						}
+					},
+					"name": "string.quoted.single.powershell",
+					"patterns": [
+						{
+							"match": "['\\x{2018}-\\x{201B}]{2}",
+							"name": "constant.character.escape.powershell"
+						}
+					]
+				},
+				{
+					"comment": "double quoted here-strings",
+					"begin": "\\G@[\"\\x{201C}-\\x{201E}]",
+					"beginCaptures": {
+						"0": {
+							"name": "string.quoted.double.heredoc.powershell punctuation.definition.heredoc.begin.powershell"
+						}
+					},
+					"end": "^([\"\\x{201C}-\\x{201E}]@)|\\G((?:\\s*\\S+)+)(?:(?!\\n)\\s)*$",
+					"endCaptures": {
+						"1": {
+							"name": "string.quoted.double.heredoc.powershell punctuation.definition.heredoc.end.powershell"
+						},
+						"2": {
+							"patterns": [
+								{
+									"match": "\\S+",
+									"name": "invalid.source.powershell"
+								}
+							]
+						}
+					},
+					"contentName": "string.quoted.double.heredoc.powershell",
+					"patterns": [
+						{
+							"include": "#variableNoProperty"
+						},
+						{
+							"include": "#doubleQuotedHereStringEscapes"
+						},
+						{
+							"include": "#substatementEmbedded"
+						}
+					]
+				},
+				{
+					"comment": "single quoted here-strings",
+					"begin": "\\G@['\\x{2018}-\\x{201B}]",
+					"beginCaptures": {
+						"0": {
+							"name": "string.quoted.single.heredoc.powershell punctuation.definition.heredoc.begin.powershell"
+						}
+					},
+					"end": "^(['\\x{2018}-\\x{201B}]@)|\\G((?:\\s*\\S+)+)(?:(?!\\n)\\s)*$",
+					"endCaptures": {
+						"1": {
+							"name": "string.quoted.single.heredoc.powershell punctuation.definition.heredoc.end.powershell"
+						},
+						"2": {
+							"patterns": [
+								{
+									"match": "\\S+",
+									"name": "invalid.source.powershell"
+								}
+							]
+						}
+					},
+					"contentName": "string.quoted.single.heredoc.powershell"
+				},
+				{
+					"comment": "double quoted strings",
+					"begin": "\\G(?:[\"\\x{201C}-\\x{201E}])",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.powershell"
+						}
+					},
+					"end": "(?:[\"\\x{201C}-\\x{201E}])",
+					"applyEndPatternLast": true,
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.powershell"
+						}
+					},
+					"name": "string.quoted.double.powershell",
+					"patterns": [
+						{
+							"include": "#variableNoProperty"
+						},
+						{
+							"include": "#doubleQuotedStringEscapes"
+						},
+						{
+							"include": "#substatementEmbedded"
+						}
+					]
+				},
+				{
+					"begin": "(?=\\.(?!\\.)|::|\\[)",
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#accessors"
+						}
+					]
+				}
+			]
+		},
+		"functionName": {
+			"patterns": [
+				{
+					"match": "`(?!\\n)\\s",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#argumentModeEscapes"
+				},
+				{
+					"begin": "['\\x{2018}-\\x{201B}]",
+					"end": "['\\x{2018}-\\x{201B}]",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"match": "['\\x{2018}-\\x{201B}]{2}",
+							"name": "constant.character.escape.powershell"
+						}
+					]
+				},
+				{
+					"begin": "[\"\\x{201C}-\\x{201E}]",
+					"end": "[\"\\x{201C}-\\x{201E}]",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#doubleQuotedStringEscapes"
+						},
+						{
+							"begin": "\\$\\(",
+							"end": "\\)",
+							"patterns": [
+								{
+									"include": "#functionName"
+								}
+							]
+						}
+					]
+				},
+				{
+					"begin": "\\$\\(",
+					"end": "\\)",
+					"patterns": [
+						{
+							"include": "#functionName"
+						}
+					]
+				},
+				{
+					"begin": "\\$\\{",
+					"end": "}",
+					"patterns": [
+						{
+							"match": "\\$"
+						},
+						{
+							"include": "#functionName"
+						}
+					]
+				}
+			]
+		},
+		"unquotedStrings_text": {
+			"patterns": [
+				{
+					"match": "`(?!\\n)\\s",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#argumentModeEscapes"
+				},
+				{
+					"include": "#variableNoProperty"
+				},
+				{
+					"include": "#quotedStrings_Members"
+				},
+				{
+					"include": "#substatementEmbedded"
+				}
+			]
+		},
+		"unquotedStrings_text_interpolatedString": {
+			"comment": "!!!!!!!!!!!!!!!!!!WIP!!!",
+			"patterns": [
+				{
+					"match": "`(?!\\n)\\s",
+					"name": "constant.character.escape.powershell"
+				},
+				{
+					"include": "#argumentModeEscapes"
+				},
+				{
+					"begin": "['\\x{2018}-\\x{201B}]",
+					"end": "['\\x{2018}-\\x{201B}]",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"match": "['\\x{2018}-\\x{201B}]{2}",
+							"name": "constant.character.escape.powershell"
+						}
+					]
+				},
+				{
+					"begin": "[\"\\x{201C}-\\x{201E}]",
+					"end": "[\"\\x{201C}-\\x{201E}]",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#doubleQuotedStringEscapes"
+						},
+						{
+							"begin": "\\$\\(",
+							"end": "\\)",
+							"patterns": [
+								{
+									"include": "#unquotedStrings_text"
+								}
+							]
+						}
+					]
+				},
+				{
+					"begin": "\\$\\(",
+					"end": "\\)",
+					"patterns": [
+						{
+							"include": "#unquotedStrings_text"
+						}
+					]
+				}
+			]
+		},
+		"terminators": {
+			"patterns": [
+				{
+					"comment": "`||` and `&&` conditional terminators are reserved.",
+					"match": "\\|\\||&&",
+					"name": "invalid.reserved.powershell"
+				}
+			]
+		},
+		"operators_post": {
+			"comment": "expression mode operators that follow operands mutually exclusive of each other.",
+			"patterns": [
+				{
+					"match": "(\\+\\+)|([\\x{2013}-\\x{2015}-]{2})",
+					"captures": {
+						"1": {
+							"name": "keyword.operator.arithmetic.postfix.unary.increment.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.arithmetic.postfix.unary.decrement.powershell"
+						}
+					}
+				},
+				{
+					"comment": "the range operator is only available after an operand (but is a binary operator)",
+					"begin": "(?<!^)\\s*(\\.\\.)",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.range.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "(?:[+%*/\\x{2013}-\\x{2015}-]|\\?\\?)?=",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.assignment.powershell"
+						}
+					},
+					"end": "(?=\\n)(?!\\G)|(?=[,;&)}\\]])",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"include": "$self"
+						}
+					]
+				}
+			]
+		},
+		"operators_preUnary": {
+			"comment": "expression mode unary operators that precede operands.",
+			"patterns": [
+				{
+					"comment": "`,` just continues current mode, after advancing to next token",
+					"begin": ",",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.unary.array-element-separator.comma.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "(\\+\\+)|([\\x{2013}-\\x{2015}-]{2})",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.arithmetic.prefix.unary.increment.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.arithmetic.prefix.unary.decrement.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[\\x{2013}-\\x{2015}-]((?i:join|[ic]?(?:split)))(?!\\p{L})",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.unary.string-$1.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "(?:(?=[\\x{2013}-\\x{2015}-])(?i:(.not)|(.bnot)|(.)(?![\\d.]))|(!))(?!\\p{L})|(\\+)(?![\\d.])",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.logical.unary.not.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.bitwise.unary.bnot.powershell"
+						},
+						"3": {
+							"name": "keyword.operator.arithmetic.unary.negate.powershell"
+						},
+						"4": {
+							"name": "keyword.operator.logical.unary.not.powershell"
+						},
+						"5": {
+							"name": "keyword.operator.arithmetic.unary.positive.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				}
+			]
+		},
+		"operators": {
+			"patterns": [
+				{
+					"include": "#operators_post"
+				},
+				{
+					"comment": "`,` just continues current mode, after advancing to next token",
+					"begin": ",",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.array-element-separator.comma.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "(?=[\\x{2013}-\\x{2015}-])(?i:(.is(?:not)?)|(.as))(?!\\p{L})",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.operator.comparison.type.powershell"
+						},
+						"2": {
+							"name": "keyword.operator.type-cast.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[\\x{2013}-\\x{2015}-]((?i:[ic]?(?:eq|ne|[gl][te]|(?:not)?(?:like|match|contains|in))))(?!\\p{L})",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.comparison.$1.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[\\x{2013}-\\x{2015}-]((?i:join|[ic]?(?:split|replace)))(?!\\p{L})",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.string-$1.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[\\x{2013}-\\x{2015}-]((?i:and|or|xor))(?!\\p{L})",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.logical.$1.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[\\x{2013}-\\x{2015}-]((?i:band|bor|bxor|shl|shr))(?!\\p{L})",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.bitwise.$1.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[\\x{2013}-\\x{2015}-](?i:f)(?!\\p{L})",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.string-format.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "[+%*/]|[\\x{2013}-\\x{2015}-](?![\\p{L}\\x{2013}-\\x{2015}-])",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.arithmetic.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"begin": "\\?\\?",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.null-coalesce.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						}
+					]
+				},
+				{
+					"comment": "included last only because preunary also includes the negate `!` and `-b?not` operators, but we didn't want the `-` negate operator replacing `-` subtract.",
+					"old include": "#operators_preUnary"
+				}
+			]
+		},
+		"notCode": {
+			"patterns": [
+				{
+					"match": "`(?!\\n)\\s",
+					"name": "invalid.character.escape.powershell"
+				},
+				{
+					"include": "#commentBlock"
+				},
+				{
+					"include": "#commentLine"
+				},
+				{
+					"comment": "when nothing else matches in usual tokenizing, consume it to prevent other patterns from striking in the middle of what might be a command name.",
+					"begin": "(?=[^\\[\\s{(,;&|)}])",
+					"end": "(?=[\\s{(,;&|)}])",
+					"contentName": "invalid.source.powershell",
+					"patterns": [
+						{
+							"include": "#unquotedStrings_text"
+						}
+					]
+				}
+			]
+		},
+		"redirection": {
+			"patterns": [
+				{
+					"include": "#terminators"
+				},
+				{
+					"comment": "`&` resume's in statement mode, added PowerShell 6 (previously reserved)",
+					"begin": "&",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.terminator.job.powershell"
+						}
+					},
+					"end": "(?=[\\n;)}\\]])",
+					"patterns": [
+						{
+							"include": "$self"
+						}
+					]
+				},
+				{
+					"comment": "`|` resume's in command mode",
+					"begin": "\\|(?!\\|)",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.other.pipe.powershell"
+						}
+					},
+					"end": "(?=\\n)(?!\\G)|(?=[;&)}\\]])",
+					"patterns": [
+						{
+							"include": "#advanceToToken"
+						},
+						{
+							"include": "#command_mode"
+						}
+					]
+				},
+				{
+					"match": "<(?!#)|[1-6]>&2",
+					"name": "invalid.reserved.redirection.powershell"
+				},
+				{
+					"match": "[2-6*]>&1",
+					"name": "keyword.operator.redirection.to-stdout.powershell"
+				},
+				{
+					"begin": "[1-6*]?>>?",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.operator.redirection.powershell"
+						}
+					},
+					"end": "(?=.|$)",
+					"applyEndPatternLast": true,
+					"patterns": [
+						{
+							"include": "#advanceToArgument"
+						},
+						{
+							"begin": "(?<=[\\s>]|\\G|^)(?![\\s#;&|)}]|<#|$|`\\s)",
+							"end": "(?!\\G)",
+							"name": "meta.argument.redirect-file.powershell",
+							"patterns": [
+								{
+									"comment": "`,`, `<` and `>` not permitted here",
+									"match": "[,<>]",
+									"name": "invalid.source.powershell"
+								},
+								{
+									"include": "#argument"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	}
+}

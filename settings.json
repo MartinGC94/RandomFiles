@@ -23,8 +23,7 @@
     "editor.suggest.filterGraceful": false,
     "editor.wordBasedSuggestions": false,
     "editor.suggestSelection": "first",
-    "workbench.colorTheme": "ISE Dark Theme",
-    "powershell.powerShellDefaultVersion": "PowerShell Preview (x64)",
+    "powershell.powerShellDefaultVersion": "Windows PowerShell (x64)",
     "workbench.sideBar.location": "right",
     "editor.autoIndent": "keep",
     "terminal.integrated.mouseWheelScrollSensitivity": 0.3,
@@ -34,5 +33,11 @@
         "comments": false,
         "strings": false
     },
-    "powershell.buttons.showPanelMovementButtons": true
+    "powershell.buttons.showPanelMovementButtons": true,
+    "powershell.codeFormatting.openBraceOnSameLine": false,
+    "editor.lineHeight": 13,
+    "editor.mouseWheelScrollSensitivity": 0.65,
+    "window.zoomLevel": 0,
+    "workbench.colorTheme": "ISE Light Theme",
+    "editor.matchBrackets": "near"
 }
