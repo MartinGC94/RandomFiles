@@ -214,7 +214,7 @@
                 "keyword.type.drive"
             ],
             "DarkSettings": {
-                "foreground": "#f04500"
+                "foreground": "#87ceeb"
             },
             "LightSettings": {
                 "foreground": "#ff4500"

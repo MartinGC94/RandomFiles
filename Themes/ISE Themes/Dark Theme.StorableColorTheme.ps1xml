@@ -248,13 +248,13 @@
     </Color>
     <Color>
       <A>255</A>
-      <R>0</R>
+      <R>106</R>
       <G>153</G>
-      <B>0</B>
+      <B>85</B>
       <ScA>1</ScA>
-      <ScR>0</ScR>
+      <ScR>0.144128472</ScR>
       <ScG>0.3185468</ScG>
-      <ScB>0</ScB>
+      <ScB>0.09084172</ScB>
     </Color>
     <Color>
       <A>255</A>
@@ -398,13 +398,13 @@
     </Color>
     <Color>
       <A>255</A>
-      <R>240</R>
-      <G>69</G>
-      <B>0</B>
+      <R>135</R>
+      <G>206</G>
+      <B>235</B>
       <ScA>1</ScA>
-      <ScR>0.8713671</ScR>
-      <ScG>0.0595112443</ScG>
-      <ScB>0</ScB>
+      <ScR>0.242281154</ScR>
+      <ScG>0.6172066</ScG>
+      <ScB>0.8307699</ScB>
     </Color>
     <Color>
       <A>255</A>
@@ -628,23 +628,23 @@
     </Color>
     <Color>
       <A>255</A>
-      <R>0</R>
-      <G>178</G>
-      <B>0</B>
+      <R>106</R>
+      <G>153</G>
+      <B>85</B>
       <ScA>1</ScA>
-      <ScR>0</ScR>
-      <ScG>0.445201218</ScG>
-      <ScB>0</ScB>
+      <ScR>0.144128472</ScR>
+      <ScG>0.3185468</ScG>
+      <ScB>0.09084172</ScB>
     </Color>
     <Color>
       <A>255</A>
-      <R>0</R>
-      <G>220</G>
-      <B>0</B>
+      <R>106</R>
+      <G>153</G>
+      <B>85</B>
       <ScA>1</ScA>
-      <ScR>0</ScR>
-      <ScG>0.715693533</ScG>
-      <ScB>0</ScB>
+      <ScR>0.144128472</ScR>
+      <ScG>0.3185468</ScG>
+      <ScB>0.09084172</ScB>
     </Color>
     <Color>
       <A>255</A>
@@ -768,13 +768,13 @@
     </Color>
     <Color>
       <A>255</A>
-      <R>255</R>
-      <G>0</G>
-      <B>0</B>
+      <R>135</R>
+      <G>206</G>
+      <B>235</B>
       <ScA>1</ScA>
-      <ScR>1</ScR>
-      <ScG>0</ScG>
-      <ScB>0</ScB>
+      <ScR>0.242281154</ScR>
+      <ScG>0.6172066</ScG>
+      <ScB>0.8307699</ScB>
     </Color>
     <Color>
       <A>255</A>
@@ -788,12 +788,12 @@
     </Color>
     <Color>
       <A>255</A>
-      <R>255</R>
-      <G>255</G>
+      <R>0</R>
+      <G>191</G>
       <B>255</B>
       <ScA>1</ScA>
-      <ScR>1</ScR>
-      <ScG>1</ScG>
+      <ScR>0</ScR>
+      <ScG>0.5209956</ScG>
       <ScB>1</ScB>
     </Color>
     <Color>
