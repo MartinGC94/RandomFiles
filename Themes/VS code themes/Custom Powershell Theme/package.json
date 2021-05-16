@@ -1,5 +1,5 @@
 {
-	"name": "Improved ISE Theme",
+	"name": "custom-powershell-theme",
 	"displayName": "%displayName%",
 	"description": "%description%",
 	"version": "1.0.0",
@@ -9,14 +9,14 @@
 	"contributes": {
 		"themes": [
 			{
-				"label": "ISE Light Theme",
+				"label": "Powershell Light Theme",
 				"uiTheme": "vs",
-				"path": "./themes/ISE-Light-Theme.json"
+				"path": "./themes/Powershell-Light-Theme.json"
 			},
 			{
-				"label": "ISE Dark Theme",
+				"label": "Powershell Dark Theme",
 				"uiTheme": "vs-dark",
-				"path": "./themes/ISE-Dark-Theme.json"
+				"path": "./themes/Powershell-Dark-Theme.json"
 			}
 		]
 	}

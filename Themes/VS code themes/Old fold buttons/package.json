@@ -1,0 +1,19 @@
+{
+	"name": "oldfoldbuttons",
+    "displayName": "Old fold buttons",
+	"version": "1.0.0",
+	"publisher": "MartinGC94",
+	"engines": {
+		"vscode": "*"
+	},
+	"enableProposedApi": true,
+	"contributes": {
+		"productIconThemes": [
+			{
+				"id": "oldfoldbuttons",
+				"label": "Old fold buttons",
+				"path": "./theme/OldFoldButtons.json"
+			}
+		]
+	}
+}

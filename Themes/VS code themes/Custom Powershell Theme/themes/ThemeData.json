@@ -6,23 +6,42 @@
         "editorSuggestWidget.foreground": "#ffffff",
         "editorSuggestWidget.highlightForeground": "#ff9600",
         "editorSuggestWidget.selectedBackground": "#0057ad",
+        "list.highlightForeground": "#ff9600",
         "list.hoverBackground": "#094771",
         "list.hoverForeground": "#ffffff",
         "menu.background": "#252526",
         "menu.foreground": "#cccccc",
         "panelTitle.activeBorder": "#09ff00",
-        "terminal.background": "#012456"
+        "terminal.background": "#012456",
+        "terminal.ansiBlack":"#000000",
+        "terminal.ansiBrightBlack":"#808080",
+        "terminal.ansiBlue":"#0037da",
+        "terminal.ansiBrightBlue":"#3b78ff",
+        "terminal.ansiCyan":"#3396dd",
+        "terminal.ansiBrightCyan":"#61d6d6",
+        "terminal.ansiGreen":"#11a10e",
+        "terminal.ansiBrightGreen":"#14c60d",
+        "terminal.ansiMagenta":"#881798",
+        "terminal.ansiBrightMagenta":"#b4009e",
+        "terminal.ansiRed":"#c50f1f",
+        "terminal.ansiBrightRed":"#e74856",
+        "terminal.ansiWhite":"#cccccc",
+        "terminal.ansiBrightWhite":"#f2f2f2",
+        "terminal.ansiYellow":"#c19c00",
+        "terminal.ansiBrightYellow":"#f9f1a5"
     },
     "LightColors": {
         "activityBar.background": "#f5f3f1",
         "activityBar.foreground": "#000000",
+        "editor.inactiveSelectionBackground": "#c5c5c5",
         "editorGroupHeader.tabsBackground": "#f5e9d9",
         "editorSuggestWidget.background": "#ffffff",
         "editorSuggestWidget.foreground": "#000000",
-        "editorSuggestWidget.highlightForeground": "#ff9600",
-        "list.hoverBackground": "#0074e8",
-        "list.hoverForeground": "#ffffff",
-        "panel.background": "#e1d5c5",
+        "list.highlightForeground": "#ff9600",
+        "list.focusHighlightForeground": "#ffc800",
+        "list.hoverBackground": "#e8e8e8",
+        "list.hoverForeground": "#000000",
+        "panel.background": "#dfeaf7",
         "panelTitle.activeBorder": "#ff0000",
         "panelTitle.activeForeground": "#000000",
         "panelTitle.inactiveForeground": "#000000",
@@ -40,7 +59,23 @@
         "terminal.background": "#012456",
         "terminal.foreground": "#f5f5f5",
         "titleBar.activeBackground": "#dfeaf7",
-        "titleBar.activeForeground": "#000000"
+        "titleBar.activeForeground": "#000000",
+        "terminal.ansiBlack":"#000000",
+        "terminal.ansiBrightBlack":"#808080",
+        "terminal.ansiBlue":"#0037da",
+        "terminal.ansiBrightBlue":"#3b78ff",
+        "terminal.ansiCyan":"#3396dd",
+        "terminal.ansiBrightCyan":"#61d6d6",
+        "terminal.ansiGreen":"#11a10e",
+        "terminal.ansiBrightGreen":"#14c60d",
+        "terminal.ansiMagenta":"#881798",
+        "terminal.ansiBrightMagenta":"#b4009e",
+        "terminal.ansiRed":"#c50f1f",
+        "terminal.ansiBrightRed":"#e74856",
+        "terminal.ansiWhite":"#cccccc",
+        "terminal.ansiBrightWhite":"#f2f2f2",
+        "terminal.ansiYellow":"#c19c00",
+        "terminal.ansiBrightYellow":"#f9f1a5"
     },
     "tokenColors": [
         {
@@ -62,7 +97,7 @@
                 "support.function"
             ],
             "DarkSettings": {
-                "foreground": "#0096ff"
+                "foreground": "#569cff"
             },
             "LightSettings": {
                 "foreground": "#0000ff"
@@ -76,7 +111,7 @@
                 "keyword.control.switch-default"
             ],
             "DarkSettings": {
-                "foreground": "#ff96ff"
+                "foreground": "#40e0d0"
             },
             "LightSettings": {
                 "foreground": "#8a2be2"
@@ -112,13 +147,14 @@
             "scope": [
                 "keyword.control",
                 "keyword.declaration",
+                "keyword.other",
                 "storage.modifier"
             ],
             "DarkSettings": {
                 "foreground": "#b2b200"
             },
             "LightSettings": {
-                "foreground": "#00008b"
+                "foreground": "#6495ed"
             }
         },
         {
@@ -127,10 +163,10 @@
                 "constant.numeric"
             ],
             "DarkSettings": {
-                "foreground": "#dc64dc"
+                "foreground": "#d8bfd8"
             },
             "LightSettings": {
-                "foreground": "#800080"
+                "foreground": "#da70d6"
             }
         },
         {
@@ -138,6 +174,7 @@
             "scope": [
                 "punctuation.definition.parameter",
                 "keyword.operator",
+                "keyword.control.requires",
                 "punctuation.section.bracket",
                 "string.quoted.double.xml",
                 "string.quoted.single.xml"
@@ -154,12 +191,13 @@
             "scope": [
                 "text.xml",
                 "variable.parameter.attribute",
-                "keyword.other",
                 "entity.name",
                 "constant.character.escape",
                 "variable.other.property",
                 "punctuation.terminator.statement",
+                "keyword.other.array",
                 "keyword.other.hashtable",
+                "keyword.other.substatement",
                 "punctuation.section",
                 "entity.name.variable",
                 "entity.name.function.method",
@@ -181,7 +219,7 @@
                 "entity.name.tag.xml"
             ],
             "DarkSettings": {
-                "foreground": "#dc8282"
+                "foreground": "#d69d85"
             },
             "LightSettings": {
                 "foreground": "#8b0000"
@@ -198,7 +236,7 @@
                 "entity.other.inherited-class"
             ],
             "DarkSettings": {
-                "foreground": "#00afaf"
+                "foreground": "#43c9b0"
             },
             "LightSettings": {
                 "foreground": "#006161"
@@ -230,6 +268,18 @@
             },
             "LightSettings": {
                 "foreground": "#808080"
+            }
+        },
+        {
+            "name": "InvalidInput",
+            "scope": [
+                "invalid"
+            ],
+            "DarkSettings": {
+                "foreground": "#ff00dd"
+            },
+            "LightSettings": {
+                "foreground": "#ff00dd"
             }
         }
     ]
