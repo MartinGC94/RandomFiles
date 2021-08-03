@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>PartitionTableView</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#MSFT_Partition</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>DiskId</PropertyName>
+        <Label>DiskPath</Label>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>PartitionNumber</Label>
+            <Width>16</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>DriveLetter</Label>
+            <Width>11</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Offset</Label>
+            <Width>10</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Size</Label>
+            <Width>10</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Type</Label>
+            <Width>10</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>PartitionNumber</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Result = $_.DriveLetter
+                  if ([char]0 -eq $Result)
+                  {
+                      $Result=""
+                  }
+                  return $Result
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Bytes = $_.Offset
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Bytes = $_.Size
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Type</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>VolumeTableView</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#MSFT_Volume</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>DriveLetter</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>FileSystemLabel</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>FileSystem</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>AllocationUnitSize</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>SizeRemaining</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Size</Label>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>DriveLetter</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>FileSystemLabel</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>FileSystem</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <Alignment>Right</Alignment>
+                <ScriptBlock>
+                  $Bytes = $_.AllocationUnitSize
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <Alignment>Right</Alignment>
+                <ScriptBlock>
+                  $Bytes = $_.SizeRemaining
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                 </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <Alignment>Right</Alignment>
+                <ScriptBlock>
+                  $Bytes = $_.Size
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  <View>
+      <Name>PhysicalDiskTableView</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#root/microsoft/windows/storage/MSFT_PhysicalDisk</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>DeviceId</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Model</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>SerialNumber</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Size</Label>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>AllocatedSize</Label>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>DeviceId</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Model</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>SerialNumber</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <Alignment>Right</Alignment>
+                <ScriptBlock>
+                  $Bytes = $_.Size
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <Alignment>Right</Alignment>
+                <ScriptBlock>
+                  $Bytes = $_.AllocatedSize
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                 </ScriptBlock>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <Configuration>
   <ViewDefinitions>
     <View>
@@ -41,11 +42,236 @@
 
               <TableColumnItem>
                 <ScriptBlock>
-                  $size = $_.ImageSize;
-                  $postfixes = @( "B", "KB", "MB", "GB", "TB", "PB" )
-                  for ($i=0; $size -ge 1024 -and $i -lt $postfixes.Length; $i++) { $size = $size / 1024; }
-                  return "" + [System.Math]::Round($size,2) + " " + $postfixes[$i];
+                  $Bytes = $_.ImageSize
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
                 </ScriptBlock>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>AppxProvisionedPackage</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.AppxPackageObject</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>DisplayName</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Version</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Architecture</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Version</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  $ArcTable=@{
+                      0="x86"
+                      5="Arm"
+                      9="x64"
+                      11="Neutral"
+                      12="Arm64"
+                      14="X86OnArm64"
+                      65535="Unknown"
+                  }
+                  $ArcText=$ArcTable[[int]$_.Architecture]
+                  if ($ArcText)
+                  {
+                      $ArcText
+                  }
+                  else
+                  {
+                      $_.Architecture
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>BasicPackageObject</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.BasicPackageObject</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>PackageName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>PackageState</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>ReleaseType</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>InstallTime</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>BasicFeatureObject</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.BasicFeatureObject</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>FeatureName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>State</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>BasicCapabilityObject</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.BasicCapabilityObject</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>State</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>BasicDriverObject</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.BasicDriverObject</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>Driver</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>ClassName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>ProviderName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Date</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Version</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>OriginalFileName</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+      <View>
+      <Name>ImageObject</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.ImageObject</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Width>7</Width>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Width>14</Width>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>Online</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>RestartNeeded</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Path</PropertyName>
               </TableColumnItem>
 
             </TableColumnItems>

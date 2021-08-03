@@ -1,103 +1,107 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <Configuration>
-    <SelectionSets>
-        <SelectionSet>
-            <Name>FileSystemTypes</Name>
-            <Types>
-                <TypeName>System.IO.DirectoryInfo</TypeName>
-                <TypeName>System.IO.FileInfo</TypeName>
-            </Types>
-        </SelectionSet>
-    </SelectionSets>
+  <Controls>
+    <Control>
+      <Name>FileSystemTypes-GroupingFormat</Name>
+      <CustomControl>
+        <CustomEntries>
+          <CustomEntry>
+            <CustomItem>
+              <Frame>
+                <LeftIndent>4</LeftIndent>
+                <CustomItem>
+                  <Text AssemblyName="System.Management.Automation" BaseName="FileSystemProviderStrings" ResourceId="DirectoryDisplayGrouping"/>
+                  <ExpressionBinding>
+                    <ScriptBlock>
+                      $_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::","")
+                    </ScriptBlock>
+                  </ExpressionBinding>
+                  <NewLine/>
+                </CustomItem>
+              </Frame>
+            </CustomItem>
+          </CustomEntry>
+        </CustomEntries>
+      </CustomControl>
+    </Control>
+  </Controls>
+  <ViewDefinitions>
+    <View>
+      <Name>FormattedBytes</Name>
+      <ViewSelectedBy>
+        <TypeName>System.IO.DirectoryInfo</TypeName>
+        <TypeName>System.IO.FileInfo</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>PSParentPath</PropertyName>
+        <CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
 
-    <!-- ################ GLOBAL CONTROL DEFINITIONS ################ -->
-    <Controls>
-        <Control>
-            <Name>FileSystemTypes-GroupingFormat</Name>
-                    <CustomControl>
-                        <CustomEntries>
-                            <CustomEntry>
-                                <CustomItem>
-                                    <Frame>
-                                        <LeftIndent>4</LeftIndent>
-                                        <CustomItem>
-                                            <Text AssemblyName="System.Management.Automation" BaseName="FileSystemProviderStrings" ResourceId="DirectoryDisplayGrouping"/>
-                                            <ExpressionBinding>
-                                              <ScriptBlock>
-                                                  $_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::", "")                                                  
-                                              </ScriptBlock>
-                                            </ExpressionBinding>
-                                            <NewLine/>
-                                        </CustomItem> 
-                                    </Frame>
-                                </CustomItem>
-                            </CustomEntry>
-                        </CustomEntries>
-            </CustomControl>
-        </Control>
-    </Controls>
-    
-    <!-- ################ VIEW DEFINITIONS ################ -->
+          <TableColumnHeader>
+            <Label>Mode</Label>
+            <Width>7</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
 
-    <ViewDefinitions>
-       <View>
-            <Name>children</Name>
-            <ViewSelectedBy>
-                <SelectionSetName>FileSystemTypes</SelectionSetName>
-            </ViewSelectedBy>
-            <GroupBy>
-                <PropertyName>PSParentPath</PropertyName> 
-                <CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>  
-            </GroupBy>
-            <TableControl>
-                <TableHeaders>
-                   <TableColumnHeader>
-                      <Label>Mode</Label>
-                      <Width>7</Width>
-                      <Alignment>left</Alignment>
-                   </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>LastWriteTime</Label>
-                        <Width>25</Width>
-                        <Alignment>right</Alignment>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>Length</Label>
-                        <Width>14</Width>
-                        <Alignment>right</Alignment>
-                    </TableColumnHeader>
-                    <TableColumnHeader/>
-                </TableHeaders>
-                <TableRowEntries>
-                    <TableRowEntry>
-                        <Wrap/>
-                        <TableColumnItems>
-                            <TableColumnItem>
-                                <PropertyName>Mode</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <ScriptBlock>
-                                    [String]::Format("{0,10}  {1,8}", $_.LastWriteTime.ToString("d"), $_.LastWriteTime.ToString("t"))
-                                </ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                           	  <ScriptBlock>
-                                if ($_.Mode -notlike "d*")
-                                {
-                                    $size = $_.length;
-                                    $postfixes = @( "B", "KB", "MB", "GB", "TB", "PB" )
-                                    for ($i=0; $size -ge 1024 -and $i -lt $postfixes.Length; $i++) { $size = $size / 1024; }
-                                    return "" + [System.Math]::Round($size,2) + " " + $postfixes[$i];
-                                }
-                              </ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>Name</PropertyName>
-                            </TableColumnItem>
-                        </TableColumnItems>
-                    </TableRowEntry>
-                </TableRowEntries>
-            </TableControl>
-        </View>   
-    </ViewDefinitions>
+          <TableColumnHeader>
+            <Label>LastWriteTime</Label>
+            <Width>25</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Length</Label>
+            <Width>14</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Name</Label>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <Wrap/>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>Mode</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  [String]::Format("{0,10}{1,8}",$_.LastWriteTime.ToString("d"),$_.LastWriteTime.ToString("t"))
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ([int]($_.Attributes -band [System.IO.FileAttributes]::Directory) -eq 0)
+                  {
+                    $Bytes = $_.Length
+                    if     ($null  -eq $Bytes) {return ""}
+                    elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                    elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                    elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                    elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                    elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                    elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  }
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
 </Configuration>

@@ -1,0 +1,696 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+  <SelectionSets>
+    <SelectionSet>
+      <Name>Tasks</Name>
+      <Types>
+        <TypeName>VMware.VimAutomation.ViCore.Impl.V1.Task.TaskImpl</TypeName>
+        <TypeName>VMware.VimAutomation.Cloud.Impl.V1.CITaskImpl</TypeName>
+        <TypeName>VMware.VimAutomation.ViCore.Util10.Task.ClientSideTaskImpl</TypeName>
+        <TypeName>VMware.VimAutomation.Sdk.Util10.Task.ClientSideTaskImpl</TypeName>
+      </Types>
+    </SelectionSet>
+  </SelectionSets>
+  <Controls>
+    <Control>
+      <Name>FileSystemTypes-GroupingFormat</Name>
+      <CustomControl>
+        <CustomEntries>
+          <CustomEntry>
+            <CustomItem>
+              <Frame>
+                <LeftIndent>4</LeftIndent>
+                <CustomItem>
+                  <Text AssemblyName="System.Management.Automation" BaseName="FileSystemProviderStrings" ResourceId="DirectoryDisplayGrouping" />
+                  <ExpressionBinding>
+                    <ScriptBlock>
+                      $_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::","")
+                    </ScriptBlock>
+                  </ExpressionBinding>
+                  <NewLine />
+                </CustomItem>
+              </Frame>
+            </CustomItem>
+          </CustomEntry>
+        </CustomEntries>
+      </CustomControl>
+    </Control>
+  </Controls>
+  <ViewDefinitions>
+    <View>
+      <Name>AppxPackage</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Windows.Appx.PackageManager.Commands.AppxPackage</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Version</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Architecture</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>BasicImageInfoObjectList</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Dism.Commands.BasicImageInfoObject</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>ImagePath</PropertyName>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>ImageIndex</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>ImageName</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>ImageSize</Label>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>ImageIndex</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>ImageName</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Bytes = $_.ImageSize
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                </ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>FormattedBytes</Name>
+      <ViewSelectedBy>
+        <TypeName>System.IO.DirectoryInfo</TypeName>
+        <TypeName>System.IO.FileInfo</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>PSParentPath</PropertyName>
+        <CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Mode</Label>
+            <Width>7</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>LastWriteTime</Label>
+            <Width>25</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Length</Label>
+            <Width>14</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Name</Label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <Wrap />
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Mode</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  [String]::Format("{0,10}{1,8}",$_.LastWriteTime.ToString("d"),$_.LastWriteTime.ToString("t"))
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ([int]($_.Attributes -band [System.IO.FileAttributes]::Directory) -eq 0)
+                  {
+                    $Bytes = $_.Length
+                    if     ($null  -eq $Bytes) {return ""}
+                    elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                    elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                    elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                    elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                    elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                    elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  }
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>HighlightedMatchInfo</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.PowerShell.Commands.MatchInfo</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>Path</PropertyName>
+        <Label>Path</Label>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>LineNumber</Label>
+            <Width>10</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Line</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <Wrap />
+            <TableColumnItems>
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ($_.Context)
+                  {
+                      return ""
+                  }
+                  return $_.LineNumber
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Line=$_.Line
+                  if ($host.UI.SupportsVirtualTerminal)
+                  {
+                      $HighLightColor = "$([char]27)[92m"
+                      $ResetColor     = "$([char]27)[0m"
+
+                      #Regex match
+                      if ($_.Matches)
+                      {
+                          $AddedCharCount=0
+                          foreach ($Item in $_.Matches)
+                          {
+                              $Line=$Line.Insert($Item.Index+$AddedCharCount,$HighLightColor).Insert($Item.Index+$AddedCharCount+$HighLightColor.Length+$Item.Length,$ResetColor)
+                              $AddedCharCount+=$HighLightColor.Length+$ResetColor.Length
+                          }
+                      }
+                      #Simple match
+                      else
+                      {
+                          $Culture=[System.StringComparison]::CurrentCulture
+                          if ($_.IgnoreCase)
+                          {
+                              $Culture=[System.StringComparison]::CurrentCultureIgnoreCase
+                          }
+                          $InsertIndex=0
+                          do
+                          {
+                              $InsertIndex=$Line.IndexOf($_.Pattern,$InsertIndex,$Culture)
+                              if ($InsertIndex -ne -1)
+                              {
+                                  $Line=$Line.Insert($InsertIndex,$HighLightColor).Insert($InsertIndex+$HighLightColor.Length+$_.Pattern.Length,$ResetColor)
+                                  $InsertIndex+=$HighLightColor.Length+$ResetColor.Length+1
+                              }
+                          }
+                          until ($InsertIndex -eq -1)
+                      }
+                  }
+                  $Result=$Line
+                  if ($_.Context.PreContext)
+                  {
+                      $i=$_.LineNumber-$_.Context.PreContext.Count
+                      $PreContextLines=foreach ($Item in $_.Context.PreContext)
+                      {
+                          "$i`: $Item"
+                          $i++
+                      }
+                      $Result=[string]::Join("`n",$PreContextLines) + "`n$($_.LineNumber): $Line"
+                  }
+                  if ($_.Context.PostContext)
+                  {
+                      $i=$_.LineNumber+1
+                      $PostContextLines=foreach ($Item in $_.Context.PostContext)
+                      {
+                          "$i`: $Item"
+                          $i++
+                      }
+                      $Result="$Result`n" + [string]::Join("`n",$PostContextLines)
+                  }
+                  return $Result
+                </ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>FirewallRuleOverview</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#root/standardcimv2/MSFT_NetFirewallRule</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>DisplayName</Label>
+            <Width>40</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Profile</Label>
+            <Width>25</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Enabled</Label>
+            <Width>8</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Direction</Label>
+            <Width>9</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Action</Label>
+            <Width>6</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Profile</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Enabled</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Direction</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Action</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>IPOverview</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#ROOT/StandardCimv2/MSFT_NetIPAddress</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>AddressFamily</PropertyName>
+      </GroupBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>InterfaceAlias</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>IPAddress</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>PrefixLength</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>SuffixOrigin</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>AddressState</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>service</Name>
+      <ViewSelectedBy>
+        <TypeName>System.ServiceProcess.ServiceController</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>StartType</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Status</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>PartitionTableView</Name>
+      <ViewSelectedBy>
+        <TypeName>Microsoft.Management.Infrastructure.CimInstance#MSFT_Partition</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>DiskId</PropertyName>
+        <Label>DiskPath</Label>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>PartitionNumber</Label>
+            <Width>16</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>DriveLetter</Label>
+            <Width>11</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Offset</Label>
+            <Width>10</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Size</Label>
+            <Width>10</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Type</Label>
+            <Width>10</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>PartitionNumber</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Result = $_.DriveLetter
+                  if ([char]0 -eq $Result)
+                  {
+                      $Result=""
+                  }
+                  return $Result
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Bytes = $_.Offset
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                  $Bytes = $_.Size
+                  if     ($null  -eq $Bytes) {return ""}
+                  elseif ($Bytes -ge 1PB)    {return "$([System.Math]::Round($Bytes/1PB, 2)) PB"}
+                  elseif ($Bytes -ge 1TB)    {return "$([System.Math]::Round($Bytes/1TB, 2)) TB"}
+                  elseif ($Bytes -ge 1GB)    {return "$([System.Math]::Round($Bytes/1GB, 2)) GB"}
+                  elseif ($Bytes -ge 1MB)    {return "$([System.Math]::Round($Bytes/1MB, 2)) MB"}
+                  elseif ($Bytes -ge 1KB)    {return "$([System.Math]::Round($Bytes/1KB, 2)) KB"}
+                  elseif ($Bytes -ge 0)      {return "$Bytes B"}
+                  return ""
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Type</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>TypeInfo</Name>
+      <ViewSelectedBy>
+        <TypeName>System.RuntimeType</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>FullName</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>BaseType</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ($_.IsGenericType)
+                  {
+                      return "$($_.Namespace).$($_.Name -replace '`\d+')[$($_.GenericTypeArguments.FullName -join ',')]"
+                  }
+                  else
+                  {
+                      return $_.FullName
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>BaseType</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>VMHost</Name>
+      <ViewSelectedBy>
+        <TypeName>VMware.VimAutomation.ViCore.Impl.V1.Inventory.VMHostImpl</TypeName>
+        <TypeName>VMware.VimAutomation.ViCore.Impl.V1.LazyInitialyzedWrapper.VMHostWrapper</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Name</Label>
+            <Width>37</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>ConnectionState</Label>
+            <Width>15</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>PowerState</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>NumCpu</Label>
+            <Width>6</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>MemoryUsageGB</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>MemoryTotalGB</Label>
+            <Width>15</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Version</Label>
+            <Width>7</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>ConnectionState</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>PowerState</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>NumCpu</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                           "{0:N3}" -f $_.MemoryUsageGB
+                        </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                           "{0:N3}" -f $_.MemoryTotalGB
+                        </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Version</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Task</Name>
+      <ViewSelectedBy>
+        <SelectionSetName>Tasks</SelectionSetName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Name</Label>
+            <Width>30</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>State</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>% Complete</Label>
+            <Width>10</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Start Time</Label>
+            <Width>12</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Finish Time</Label>
+            <Width>12</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>EntityName</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>UserName</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>State</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>PercentComplete</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                           $_.StartTime.ToLocalTime().ToString("hh:mm:ss tt")
+                        </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                           $_.FinishTime.ToLocalTime().ToString("hh:mm:ss tt")
+                        </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                           $_.ExtensionData.Info.EntityName
+                        </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                            $Item=$_
+                            switch ($_.ExtensionData.Info.Reason)
+                            {
+                                'VMware.Vim.TaskReasonSystem'
+                                {
+                                    "System"
+                                }
+                                'VMware.Vim.TaskReasonAlarm'
+                                {
+                                    $Item.ExtensionData.Info.Reason.AlarmName
+                                }
+                                'VMware.Vim.TaskReasonSchedule'
+                                {
+                                    $Item.ExtensionData.Info.Reason.Name
+                                }
+                                'VMware.Vim.TaskReasonUser'
+                                {
+                                    $Item.ExtensionData.Info.Reason.UserName
+                                }
+                            }
+                        </ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

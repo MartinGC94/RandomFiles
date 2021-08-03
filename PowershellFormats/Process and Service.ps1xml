@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>service</Name>
+      <ViewSelectedBy>
+        <TypeName>System.ServiceProcess.ServiceController</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>StartType</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Status</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>DisplayName</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>process</Name>
+      <ViewSelectedBy>
+        <TypeName>System.Diagnostics.Process</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>StartTime</Label>
+            <Width>21</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>WorkingSet</Label>
+            <Width>10</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>CPU(s)</Label>
+            <Width>10</Width>
+            <Alignment>Center</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Id</Label>
+            <Width>6</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Name</Label>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>StartTime</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>"$([System.Math]::Round(($_.WS / 1MB),2)) MB"</ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ($_.CPU -ne $()) 
+                  { 
+                      $_.CPU.ToString("N") 
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Id</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>ProcessWithUserName</Name>
+      <ViewSelectedBy>
+        <TypeName>System.Diagnostics.Process#IncludeUserName</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>StartTime</Label>
+            <Width>21</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>WorkingSet</Label>
+            <Width>10</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>CPU(s)</Label>
+            <Width>10</Width>
+            <Alignment>Center</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>UserName</Label>
+            <Width>29</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Id</Label>
+            <Width>6</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>Name</Label>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <PropertyName>StartTime</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>"$([System.Math]::Round(($_.WS / 1MB),2)) MB"</ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ($_.CPU -ne $()) 
+                  { 
+                      $_.CPU.ToString("N") 
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>UserName</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Id</PropertyName>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>Name</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>TypeInfo</Name>
+      <ViewSelectedBy>
+        <TypeName>System.RuntimeType</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+
+          <TableColumnHeader>
+            <Label>FullName</Label>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+
+          <TableColumnHeader>
+            <Label>BaseType</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+
+              <TableColumnItem>
+                <ScriptBlock>
+                  if ($_.IsGenericType)
+                  {
+                      return "$($_.Namespace).$($_.Name -replace '`\d+')[$($_.GenericTypeArguments.FullName -join ',')]"
+                  }
+                  else
+                  {
+                      return $_.FullName
+                  }
+                </ScriptBlock>
+              </TableColumnItem>
+
+              <TableColumnItem>
+                <PropertyName>BaseType</PropertyName>
+              </TableColumnItem>
+
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
